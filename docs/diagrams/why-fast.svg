@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" fill="none">
+  <defs>
+    <filter id="wfShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" rx="16" fill="#FAFBFC"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700">Why NeuralBridge is faster</text>
+
+  <!-- Row 1: Appium (slowest) -->
+  <rect x="30" y="55" width="840" height="74" rx="10" fill="white" stroke="#FEE2E2" stroke-width="1" filter="url(#wfShadow)"/>
+  <rect x="30" y="55" width="6" height="74" rx="3" fill="#EF4444"/>
+
+  <text x="52" y="78" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">Appium</text>
+  <rect x="110" y="67" width="68" height="20" rx="10" fill="#FEE2E2"/>
+  <text x="144" y="81" text-anchor="middle" fill="#DC2626" font-family="system-ui, sans-serif" font-size="10" font-weight="700">5 hops</text>
+  <text x="190" y="78" fill="#DC2626" font-family="system-ui, sans-serif" font-size="10" font-weight="600">Slowest</text>
+
+  <!-- Appium pipeline -->
+  <rect x="52" y="92" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="82" y="109" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Agent</text>
+  <text x="120" y="109" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="132" y="92" width="60" height="26" rx="5" fill="#FEE2E2"/>
+  <text x="162" y="109" text-anchor="middle" fill="#991B1B" font-family="system-ui, sans-serif" font-size="10">HTTP</text>
+  <text x="200" y="109" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="212" y="92" width="100" height="26" rx="5" fill="#FEE2E2"/>
+  <text x="262" y="109" text-anchor="middle" fill="#991B1B" font-family="system-ui, sans-serif" font-size="10">Appium Server</text>
+  <text x="320" y="109" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="332" y="92" width="50" height="26" rx="5" fill="#FEE2E2"/>
+  <text x="357" y="109" text-anchor="middle" fill="#991B1B" font-family="system-ui, sans-serif" font-size="10">ADB</text>
+  <text x="390" y="109" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="402" y="92" width="100" height="26" rx="5" fill="#FEE2E2"/>
+  <text x="452" y="109" text-anchor="middle" fill="#991B1B" font-family="system-ui, sans-serif" font-size="10">UIAutomator2</text>
+  <text x="510" y="109" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="522" y="92" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="552" y="109" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Device</text>
+
+  <rect x="720" y="84" width="130" height="36" rx="18" fill="#FEF2F2"/>
+  <text x="785" y="107" text-anchor="middle" fill="#DC2626" font-family="system-ui, sans-serif" font-size="14" font-weight="800">300-1000ms</text>
+
+  <!-- Row 2: Maestro -->
+  <rect x="30" y="145" width="840" height="74" rx="10" fill="white" stroke="#FED7AA" stroke-width="1" filter="url(#wfShadow)"/>
+  <rect x="30" y="145" width="6" height="74" rx="3" fill="#F97316"/>
+
+  <text x="52" y="168" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">Maestro</text>
+  <rect x="118" y="157" width="68" height="20" rx="10" fill="#FED7AA"/>
+  <text x="152" y="171" text-anchor="middle" fill="#C2410C" font-family="system-ui, sans-serif" font-size="10" font-weight="700">3 hops</text>
+
+  <rect x="52" y="182" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="82" y="199" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Agent</text>
+  <text x="120" y="199" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="132" y="182" width="60" height="26" rx="5" fill="#FED7AA"/>
+  <text x="162" y="199" text-anchor="middle" fill="#7C2D12" font-family="system-ui, sans-serif" font-size="10">gRPC</text>
+  <text x="200" y="199" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="212" y="182" width="120" height="26" rx="5" fill="#FED7AA"/>
+  <text x="272" y="199" text-anchor="middle" fill="#7C2D12" font-family="system-ui, sans-serif" font-size="10">On-device server</text>
+  <text x="340" y="199" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="352" y="182" width="90" height="26" rx="5" fill="#FED7AA"/>
+  <text x="397" y="199" text-anchor="middle" fill="#7C2D12" font-family="system-ui, sans-serif" font-size="10">UIAutomator</text>
+  <text x="450" y="199" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="462" y="182" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="492" y="199" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Device</text>
+
+  <rect x="720" y="174" width="130" height="36" rx="18" fill="#FFF7ED"/>
+  <text x="785" y="197" text-anchor="middle" fill="#EA580C" font-family="system-ui, sans-serif" font-size="14" font-weight="800">200-500ms</text>
+
+  <!-- Row 3: mobile-mcp / ADB -->
+  <rect x="30" y="235" width="840" height="74" rx="10" fill="white" stroke="#FDE68A" stroke-width="1" filter="url(#wfShadow)"/>
+  <rect x="30" y="235" width="6" height="74" rx="3" fill="#EAB308"/>
+
+  <text x="52" y="258" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">mobile-mcp / ADB Shell</text>
+  <rect x="230" y="247" width="94" height="20" rx="10" fill="#FEF3C7"/>
+  <text x="277" y="261" text-anchor="middle" fill="#A16207" font-family="system-ui, sans-serif" font-size="10" font-weight="700">ADB-bound</text>
+
+  <rect x="52" y="272" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="82" y="289" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Agent</text>
+  <text x="120" y="289" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="132" y="272" width="80" height="26" rx="5" fill="#FEF3C7"/>
+  <text x="172" y="289" text-anchor="middle" fill="#78350F" font-family="system-ui, sans-serif" font-size="10">MCP stdio</text>
+  <text x="220" y="289" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="232" y="272" width="50" height="26" rx="5" fill="#FEF3C7"/>
+  <text x="257" y="289" text-anchor="middle" fill="#78350F" font-family="system-ui, sans-serif" font-size="10">ADB</text>
+  <text x="290" y="289" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="302" y="272" width="100" height="26" rx="5" fill="#FEF3C7"/>
+  <text x="352" y="289" text-anchor="middle" fill="#78350F" font-family="system-ui, sans-serif" font-size="10">spawn process</text>
+  <text x="410" y="289" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="422" y="272" width="90" height="26" rx="5" fill="#FEF3C7"/>
+  <text x="467" y="289" text-anchor="middle" fill="#78350F" font-family="system-ui, sans-serif" font-size="10">UIAutomator</text>
+  <text x="520" y="289" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="532" y="272" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="562" y="289" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Device</text>
+
+  <rect x="720" y="264" width="130" height="36" rx="18" fill="#FEFCE8"/>
+  <text x="785" y="287" text-anchor="middle" fill="#CA8A04" font-family="system-ui, sans-serif" font-size="14" font-weight="800">500-2000ms</text>
+
+  <!-- Row 4: droidrun -->
+  <rect x="30" y="325" width="840" height="74" rx="10" fill="white" stroke="#C7D2FE" stroke-width="1" filter="url(#wfShadow)"/>
+  <rect x="30" y="325" width="6" height="74" rx="3" fill="#818CF8"/>
+
+  <text x="52" y="348" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">droidrun</text>
+  <rect x="125" y="337" width="126" height="20" rx="10" fill="#E0E7FF"/>
+  <text x="188" y="351" text-anchor="middle" fill="#4338CA" font-family="system-ui, sans-serif" font-size="10" font-weight="700">On-device, ADB transport</text>
+
+  <rect x="52" y="362" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="82" y="379" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Agent</text>
+  <text x="120" y="379" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="132" y="362" width="90" height="26" rx="5" fill="#E0E7FF"/>
+  <text x="177" y="379" text-anchor="middle" fill="#3730A3" font-family="system-ui, sans-serif" font-size="10">ADB forward</text>
+  <text x="230" y="379" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="242" y="362" width="50" height="26" rx="5" fill="#E0E7FF"/>
+  <text x="267" y="379" text-anchor="middle" fill="#3730A3" font-family="system-ui, sans-serif" font-size="10">TCP</text>
+  <text x="300" y="379" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="312" y="362" width="100" height="26" rx="5" fill="#E0E7FF"/>
+  <text x="362" y="379" text-anchor="middle" fill="#3730A3" font-family="system-ui, sans-serif" font-size="10">Portal App</text>
+  <text x="420" y="379" fill="#CBD5E1" font-family="system-ui, sans-serif" font-size="12">&#8594;</text>
+  <rect x="432" y="362" width="60" height="26" rx="5" fill="#F1F5F9"/>
+  <text x="462" y="379" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="10">Device</text>
+
+  <rect x="720" y="354" width="130" height="36" rx="18" fill="#EEF2FF"/>
+  <text x="785" y="377" text-anchor="middle" fill="#6366F1" font-family="system-ui, sans-serif" font-size="14" font-weight="800">200-500ms</text>
+
+  <!-- Row 5: NeuralBridge (fastest) -->
+  <rect x="30" y="415" width="840" height="90" rx="10" fill="white" stroke="#A7F3D0" stroke-width="2" filter="url(#wfShadow)"/>
+  <rect x="30" y="415" width="6" height="90" rx="3" fill="#10B981"/>
+
+  <text x="52" y="440" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="800">NeuralBridge</text>
+  <rect x="160" y="428" width="68" height="20" rx="10" fill="#D1FAE5"/>
+  <text x="194" y="442" text-anchor="middle" fill="#047857" font-family="system-ui, sans-serif" font-size="10" font-weight="700">1 hop</text>
+  <text x="240" y="442" fill="#059669" font-family="system-ui, sans-serif" font-size="11" font-weight="700">Fastest</text>
+
+  <rect x="52" y="458" width="60" height="30" rx="5" fill="#F1F5F9"/>
+  <text x="82" y="477" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="11">Agent</text>
+  <text x="120" y="477" fill="#6EE7B7" font-family="system-ui, sans-serif" font-size="14">&#8594;</text>
+  <rect x="132" y="458" width="60" height="30" rx="5" fill="#D1FAE5"/>
+  <text x="162" y="477" text-anchor="middle" fill="#065F46" font-family="system-ui, sans-serif" font-size="11">HTTP</text>
+  <text x="200" y="477" fill="#6EE7B7" font-family="system-ui, sans-serif" font-size="14">&#8594;</text>
+  <rect x="212" y="458" width="330" height="30" rx="5" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="377" y="477" text-anchor="middle" fill="#065F46" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Companion App (in-process AccessibilityService)</text>
+
+  <rect x="720" y="448" width="130" height="46" rx="23" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+  <text x="785" y="477" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="16" font-weight="800">~2ms</text>
+
+  <!-- Annotation -->
+  <text x="590" y="478" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="9">No ADB. No IPC. No process spawn.</text>
+</svg>

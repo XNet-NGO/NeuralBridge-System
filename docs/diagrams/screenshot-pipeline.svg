@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200" fill="none">
+  <defs>
+    <linearGradient id="spGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+    <linearGradient id="spGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="spGrad3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#DB2777"/>
+    </linearGradient>
+    <linearGradient id="spGrad4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="spShadow" x="-4%" y="-6%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="200" rx="16" fill="#FAFBFC"/>
+
+  <!-- Stage 1: MediaProjection -->
+  <rect x="30" y="30" width="180" height="90" rx="12" fill="url(#spGrad1)" filter="url(#spShadow)"/>
+  <text x="120" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">MediaProjection</text>
+  <text x="120" y="78" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" fill-opacity="0.8">Android API</text>
+  <rect x="60" y="92" width="120" height="20" rx="10" fill="white" fill-opacity="0.2"/>
+  <text x="120" y="106" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="10" font-weight="600">&lt;30ms</text>
+
+  <!-- Arrow -->
+  <line x1="210" y1="75" x2="248" y2="75" stroke="#CBD5E1" stroke-width="2"/>
+  <polygon points="244,70 254,75 244,80" fill="#CBD5E1"/>
+
+  <!-- Stage 2: ImageReader -->
+  <rect x="256" y="30" width="180" height="90" rx="12" fill="url(#spGrad2)" filter="url(#spShadow)"/>
+  <text x="346" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">ImageReader</text>
+  <text x="346" y="78" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" fill-opacity="0.8">Hardware buffer</text>
+  <rect x="286" y="92" width="120" height="20" rx="10" fill="white" fill-opacity="0.2"/>
+  <text x="346" y="106" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="10" font-weight="600">zero-copy</text>
+
+  <!-- Arrow -->
+  <line x1="436" y1="75" x2="474" y2="75" stroke="#CBD5E1" stroke-width="2"/>
+  <polygon points="470,70 480,75 470,80" fill="#CBD5E1"/>
+
+  <!-- Stage 3: libjpeg-turbo -->
+  <rect x="482" y="30" width="180" height="90" rx="12" fill="url(#spGrad3)" filter="url(#spShadow)"/>
+  <text x="572" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">libjpeg-turbo</text>
+  <text x="572" y="78" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" fill-opacity="0.8">C++ via JNI</text>
+  <rect x="512" y="92" width="120" height="20" rx="10" fill="white" fill-opacity="0.2"/>
+  <text x="572" y="106" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="10" font-weight="600">&lt;20ms</text>
+
+  <!-- Arrow -->
+  <line x1="662" y1="75" x2="700" y2="75" stroke="#CBD5E1" stroke-width="2"/>
+  <polygon points="696,70 706,75 696,80" fill="#CBD5E1"/>
+
+  <!-- Stage 4: HTTP Send -->
+  <rect x="708" y="30" width="160" height="90" rx="12" fill="url(#spGrad4)" filter="url(#spShadow)"/>
+  <text x="788" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">HTTP Response</text>
+  <text x="788" y="78" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" fill-opacity="0.8">Base64 JPEG</text>
+  <rect x="738" y="92" width="100" height="20" rx="10" fill="white" fill-opacity="0.2"/>
+  <text x="788" y="106" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="10" font-weight="600">&lt;10ms</text>
+
+  <!-- Total bar -->
+  <rect x="30" y="140" width="838" height="46" rx="12" fill="white" stroke="#E2E8F0" stroke-width="1" filter="url(#spShadow)"/>
+  <text x="260" y="168" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">Total: ~60ms for a full 1080p JPEG screenshot</text>
+  <rect x="500" y="150" width="1" height="26" fill="#E2E8F0"/>
+  <text x="620" y="161" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="11">Full quality (80):</text>
+  <text x="720" y="161" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="11" font-weight="700">~50KB</text>
+  <text x="620" y="179" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="11">Thumbnail (40):</text>
+  <text x="720" y="179" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="11" font-weight="700">~20KB</text>
+</svg>

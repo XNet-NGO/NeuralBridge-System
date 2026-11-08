@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" fill="none">
+  <defs>
+    <linearGradient id="cpHeader" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="cpFast" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="cpSlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="cpShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="360" rx="16" fill="#FAFBFC"/>
+
+  <!-- MCP Tool Call header -->
+  <rect x="280" y="20" width="340" height="44" rx="22" fill="url(#cpHeader)" filter="url(#cpShadow)"/>
+  <text x="450" y="47" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700">MCP TOOL CALL</text>
+
+  <!-- Fork arrows -->
+  <line x1="370" y1="64" x2="220" y2="110" stroke="#94A3B8" stroke-width="2"/>
+  <polygon points="224,106 216,114 228,112" fill="#94A3B8"/>
+  <line x1="530" y1="64" x2="680" y2="110" stroke="#94A3B8" stroke-width="2"/>
+  <polygon points="676,106 684,114 672,112" fill="#94A3B8"/>
+
+  <!-- Smart routing label -->
+  <rect x="380" y="72" width="140" height="22" rx="11" fill="#F1F5F9"/>
+  <text x="450" y="87" text-anchor="middle" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="500">Intelligent routing</text>
+
+  <!-- FAST PATH card -->
+  <rect x="40" y="110" width="380" height="230" rx="14" fill="url(#cpFast)" filter="url(#cpShadow)"/>
+
+  <!-- Fast path header -->
+  <rect x="55" y="120" width="350" height="40" rx="8" fill="white" fill-opacity="0.2"/>
+  <text x="230" y="136" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" letter-spacing="1">FAST PATH</text>
+  <text x="230" y="154" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800">&lt;10ms</text>
+
+  <!-- Fast path badge -->
+  <rect x="55" y="168" width="170" height="24" rx="12" fill="white" fill-opacity="0.2"/>
+  <text x="140" y="184" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" font-weight="600">AccessibilityService</text>
+
+  <!-- Fast path items -->
+  <rect x="55" y="200" width="350" height="128" rx="8" fill="white"/>
+
+  <circle cx="78" cy="222" r="5" fill="#10B981"/>
+  <text x="92" y="226" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">tap, swipe, pinch, drag</text>
+
+  <circle cx="78" cy="244" r="5" fill="#10B981"/>
+  <text x="92" y="248" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">input_text, press_key</text>
+
+  <circle cx="78" cy="266" r="5" fill="#10B981"/>
+  <text x="92" y="270" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">get_ui_tree, find_elements</text>
+
+  <circle cx="78" cy="288" r="5" fill="#10B981"/>
+  <text x="92" y="292" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">screenshot, global_action</text>
+
+  <circle cx="78" cy="310" r="5" fill="#10B981"/>
+  <text x="92" y="314" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">notifications, events</text>
+
+  <!-- 95% badge -->
+  <rect x="280" y="286" width="110" height="34" rx="17" fill="#ECFDF5"/>
+  <text x="335" y="307" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="14" font-weight="800">95%</text>
+  <text x="335" y="286" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="9">of operations</text>
+
+  <!-- SLOW PATH card -->
+  <rect x="480" y="110" width="380" height="230" rx="14" fill="url(#cpSlow)" filter="url(#cpShadow)"/>
+
+  <!-- Slow path header -->
+  <rect x="495" y="120" width="350" height="40" rx="8" fill="white" fill-opacity="0.2"/>
+  <text x="670" y="136" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" letter-spacing="1">SLOW PATH</text>
+  <text x="670" y="154" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800">200ms+</text>
+
+  <!-- Slow path badge -->
+  <rect x="495" y="168" width="100" height="24" rx="12" fill="white" fill-opacity="0.2"/>
+  <text x="545" y="184" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="11" font-weight="600">ADB Shell</text>
+
+  <!-- Slow path items -->
+  <rect x="495" y="200" width="350" height="128" rx="8" fill="white"/>
+
+  <circle cx="518" cy="222" r="5" fill="#F59E0B"/>
+  <text x="532" y="226" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">close_app (force-stop)</text>
+
+  <circle cx="518" cy="244" r="5" fill="#F59E0B"/>
+  <text x="532" y="248" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">list_apps</text>
+
+  <circle cx="518" cy="266" r="5" fill="#F59E0B"/>
+  <text x="532" y="270" fill="#1E293B" font-family="system-ui, sans-serif" font-size="12">set_clipboard</text>
+
+  <!-- Requires ADB note -->
+  <rect x="640" y="286" width="190" height="34" rx="17" fill="#FFFBEB"/>
+  <text x="735" y="301" text-anchor="middle" fill="#B45309" font-family="system-ui, sans-serif" font-size="10" font-weight="500">Requires ADB connection</text>
+  <text x="735" y="315" text-anchor="middle" fill="#D97706" font-family="system-ui, sans-serif" font-size="14" font-weight="800">5%</text>
+</svg>

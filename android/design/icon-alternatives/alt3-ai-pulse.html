@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alt 3 · AI Pulse — NeuralBridge Icons</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .launcher-svg { border-radius: calc(var(--size, 108px) * 0.222); box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: block; transition: transform 0.3s ease; }
+  .launcher-svg:hover { transform: scale(1.05); }
+  .sizes-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 32px;
+    background: var(--surface-2);
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .size-label { font-size: 10px; color: var(--text-muted); text-align: center; font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar fade-in-up">
+  <a href="index.html" class="nav-link">← Overview</a>
+  <a href="alt1-neural-wave.html" class="nav-link">Alt 1 · Neural Wave</a>
+  <a href="alt2-bridge-signal.html" class="nav-link">Alt 2 · Bridge Signal</a>
+  <a href="alt3-ai-pulse.html" class="nav-link active">Alt 3 · AI Pulse</a>
+  <a href="implementation.html" class="nav-link">Implementation</a>
+</nav>
+
+<header class="page-header fade-in-up-d1">
+  <div class="badge">Alt 03</div>
+  <h1>AI Pulse</h1>
+  <p>A neural network constellation with pulse rings radiating from a central AI core. Strongest AI identity — drops the bridge metaphor for a pure tech statement.</p>
+</header>
+
+<div class="container">
+
+  <p class="section-label fade-in-up-d1">Launcher icon — all adaptive sizes</p>
+  <div class="sizes-row fade-in-up-d2">
+
+    <!-- Large (96px) -->
+    <div class="size-item">
+      <svg width="96" height="96" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ap-a3-lg" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#00E5FF"/>
+          </linearGradient>
+          <radialGradient id="ap-ov-a3-lg" cx="54" cy="54" r="54" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#5E72E4" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#0A1628" stop-opacity="0.45"/>
+          </radialGradient>
+          <filter id="f-ap-a3-lg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="f-core-a3-lg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="108" height="108" fill="url(#ap-a3-lg)"/>
+        <rect width="108" height="108" fill="url(#ap-ov-a3-lg)"/>
+        <circle cx="54" cy="54" r="38" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+        <circle cx="54" cy="54" r="28" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+        <circle cx="54" cy="54" r="18" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+        <line x1="54" y1="54" x2="30" y2="30" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="54" y1="54" x2="78" y2="28" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="54" y1="54" x2="84" y2="54" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="54" y1="54" x2="74" y2="78" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="54" y1="54" x2="34" y2="78" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="54" y1="54" x2="24" y2="54" stroke="white" stroke-width="1"   opacity="0.4"/>
+        <line x1="30" y1="30" x2="78" y2="28" stroke="white" stroke-width="0.7" opacity="0.2"/>
+        <line x1="78" y1="28" x2="84" y2="54" stroke="white" stroke-width="0.7" opacity="0.2"/>
+        <line x1="84" y1="54" x2="74" y2="78" stroke="white" stroke-width="0.7" opacity="0.2"/>
+        <line x1="24" y1="54" x2="34" y2="78" stroke="white" stroke-width="0.7" opacity="0.2"/>
+        <circle cx="30" cy="30" r="4.5" fill="white" filter="url(#f-ap-a3-lg)" opacity="0.9"/>
+        <circle cx="78" cy="28" r="3.5" fill="white" filter="url(#f-ap-a3-lg)" opacity="0.75"/>
+        <circle cx="84" cy="54" r="4"   fill="white" filter="url(#f-ap-a3-lg)" opacity="0.85"/>
+        <circle cx="74" cy="78" r="3.5" fill="white" filter="url(#f-ap-a3-lg)" opacity="0.75"/>
+        <circle cx="34" cy="78" r="4"   fill="white" filter="url(#f-ap-a3-lg)" opacity="0.85"/>
+        <circle cx="24" cy="54" r="3.5" fill="white" filter="url(#f-ap-a3-lg)" opacity="0.75"/>
+        <circle cx="54" cy="54" r="10" fill="rgba(255,255,255,0.18)" filter="url(#f-core-a3-lg)"/>
+        <circle cx="54" cy="54" r="7" fill="white"/>
+        <circle cx="54" cy="54" r="3" fill="url(#ap-a3-lg)"/>
+      </svg>
+      <span class="size-label">96px preview<br>(xxxhdpi ÷2)</span>
+    </div>
+
+    <!-- hdpi -->
+    <div class="size-item">
+      <svg width="72" height="72" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="ap-a3-m" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#00E5FF"/></linearGradient><filter id="f-ap-a3-m"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <rect width="108" height="108" fill="url(#ap-a3-m)"/>
+        <circle cx="54" cy="54" r="38" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+        <circle cx="54" cy="54" r="28" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+        <circle cx="54" cy="54" r="18" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+        <line x1="54" y1="54" x2="30" y2="30" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="78" y2="28" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="84" y2="54" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="74" y2="78" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="34" y2="78" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="24" y2="54" stroke="white" stroke-width="1" opacity="0.4"/>
+        <circle cx="30" cy="30" r="4.5" fill="white" filter="url(#f-ap-a3-m)" opacity="0.9"/>
+        <circle cx="78" cy="28" r="3.5" fill="white" filter="url(#f-ap-a3-m)" opacity="0.75"/>
+        <circle cx="84" cy="54" r="4"   fill="white" filter="url(#f-ap-a3-m)" opacity="0.85"/>
+        <circle cx="74" cy="78" r="3.5" fill="white" filter="url(#f-ap-a3-m)" opacity="0.75"/>
+        <circle cx="34" cy="78" r="4"   fill="white" filter="url(#f-ap-a3-m)" opacity="0.85"/>
+        <circle cx="24" cy="54" r="3.5" fill="white" filter="url(#f-ap-a3-m)" opacity="0.75"/>
+        <circle cx="54" cy="54" r="10" fill="rgba(255,255,255,0.18)" filter="url(#f-ap-a3-m)"/>
+        <circle cx="54" cy="54" r="7" fill="white"/>
+        <circle cx="54" cy="54" r="3" fill="url(#ap-a3-m)"/>
+      </svg>
+      <span class="size-label">72px<br>(hdpi)</span>
+    </div>
+
+    <!-- mdpi -->
+    <div class="size-item">
+      <svg width="48" height="48" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="ap-a3-s" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#00E5FF"/></linearGradient></defs>
+        <rect width="108" height="108" fill="url(#ap-a3-s)"/>
+        <circle cx="54" cy="54" r="34" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+        <circle cx="54" cy="54" r="22" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+        <line x1="54" y1="54" x2="30" y2="30" stroke="white" stroke-width="1.5" opacity="0.4"/>
+        <line x1="54" y1="54" x2="78" y2="30" stroke="white" stroke-width="1.5" opacity="0.4"/>
+        <line x1="54" y1="54" x2="82" y2="54" stroke="white" stroke-width="1.5" opacity="0.4"/>
+        <line x1="54" y1="54" x2="72" y2="78" stroke="white" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="30" cy="30" r="5" fill="white" opacity="0.9"/>
+        <circle cx="78" cy="30" r="4" fill="white" opacity="0.75"/>
+        <circle cx="82" cy="54" r="4.5" fill="white" opacity="0.85"/>
+        <circle cx="72" cy="78" r="4" fill="white" opacity="0.75"/>
+        <circle cx="54" cy="54" r="9" fill="rgba(255,255,255,0.25)"/>
+        <circle cx="54" cy="54" r="6" fill="white"/>
+        <circle cx="54" cy="54" r="2.5" fill="url(#ap-a3-s)"/>
+      </svg>
+      <span class="size-label">48px<br>(mdpi)</span>
+    </div>
+
+    <!-- Round variant — note: circular icons work perfectly here -->
+    <div class="size-item">
+      <svg width="96" height="96" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%;box-shadow:0 8px 32px rgba(0,0,0,0.5);display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''">
+        <defs>
+          <linearGradient id="ap-a3-r" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#00E5FF"/></linearGradient>
+          <filter id="f-ap-a3-r"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="108" height="108" fill="url(#ap-a3-r)"/>
+        <circle cx="54" cy="54" r="38" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+        <circle cx="54" cy="54" r="28" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+        <circle cx="54" cy="54" r="18" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+        <line x1="54" y1="54" x2="30" y2="30" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="78" y2="28" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="84" y2="54" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="74" y2="78" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="34" y2="78" stroke="white" stroke-width="1" opacity="0.4"/>
+        <line x1="54" y1="54" x2="24" y2="54" stroke="white" stroke-width="1" opacity="0.4"/>
+        <circle cx="30" cy="30" r="4.5" fill="white" filter="url(#f-ap-a3-r)" opacity="0.9"/>
+        <circle cx="78" cy="28" r="3.5" fill="white" filter="url(#f-ap-a3-r)" opacity="0.75"/>
+        <circle cx="84" cy="54" r="4"   fill="white" filter="url(#f-ap-a3-r)" opacity="0.85"/>
+        <circle cx="74" cy="78" r="3.5" fill="white" filter="url(#f-ap-a3-r)" opacity="0.75"/>
+        <circle cx="34" cy="78" r="4"   fill="white" filter="url(#f-ap-a3-r)" opacity="0.85"/>
+        <circle cx="24" cy="54" r="3.5" fill="white" filter="url(#f-ap-a3-r)" opacity="0.75"/>
+        <circle cx="54" cy="54" r="10" fill="rgba(255,255,255,0.18)" filter="url(#f-ap-a3-r)"/>
+        <circle cx="54" cy="54" r="7" fill="white"/>
+        <circle cx="54" cy="54" r="3" fill="url(#ap-a3-r)"/>
+      </svg>
+      <span class="size-label">Round variant ✓ ideal<br>(ic_launcher_round)</span>
+    </div>
+
+  </div>
+
+  <!-- Notification -->
+  <p class="section-label fade-in-up-d2">Notification icon — monochrome</p>
+  <div class="card fade-in-up-d3" style="margin-bottom:24px;">
+    <div class="preview-stage">
+      <div class="preview-item">
+        <div class="preview-label">24dp on status bar</div>
+        <div style="background:#1C1C2E;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+          <svg width="28" height="28" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"   fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="12" cy="12" r="5"   fill="none" stroke="white" stroke-width="1.5" opacity="0.75"/>
+            <circle cx="12" cy="12" r="2.5" fill="white"/>
+            <line x1="12" y1="2"    x2="12" y2="0.5"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="22"   x2="12" y2="23.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2"  y1="12"   x2="0.5" y2="12"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="12"   x2="23.5" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="notif-ok">✓ Monochrome — Android compliant</p>
+      </div>
+      <div class="preview-divider"></div>
+      <div class="preview-item">
+        <div class="preview-label">Notification shade</div>
+        <div class="notif-bar">
+          <div class="notif-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"   fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+              <circle cx="12" cy="12" r="5"   fill="none" stroke="white" stroke-width="1.5" opacity="0.75"/>
+              <circle cx="12" cy="12" r="2.5" fill="white"/>
+              <line x1="12" y1="2"  x2="12" y2="0.5"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <line x1="12" y1="22" x2="12" y2="23.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <line x1="2"  y1="12" x2="0.5" y2="12"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <line x1="22" y1="12" x2="23.5" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div><div class="notif-title">NeuralBridge</div><div class="notif-sub">AI agent running</div></div>
+        </div>
+        <p class="notif-ok">✓ Reads at 20px</p>
+      </div>
+      <div class="preview-divider"></div>
+      <div class="preview-item">
+        <div class="preview-label">Oversized (scalability)</div>
+        <div style="background:#1C1C2E;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+          <svg width="64" height="64" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"   fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="12" cy="12" r="5"   fill="none" stroke="white" stroke-width="1.5" opacity="0.75"/>
+            <circle cx="12" cy="12" r="2.5" fill="white"/>
+            <line x1="12" y1="2"  x2="12" y2="0.5"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="22" x2="12" y2="23.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2"  y1="12" x2="0.5" y2="12"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="12" x2="23.5" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="notif-ok">✓ Vector scales cleanly</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rationale -->
+  <div class="card fade-in-up-d3" style="margin-bottom:48px;">
+    <div class="card-body">
+      <p class="rationale-label">Design Rationale</p>
+      <p class="rationale-text">The AI Pulse design drops the bridge metaphor entirely in favor of a pure AI identity. The central "AI core" node with radiating pulse rings communicates autonomous intelligence. Six satellite nodes connected by constellation lines represent the Android devices under AI control.</p>
+      <ul class="rationale-points">
+        <li>Strongest AI / tech identity — immediately reads as "intelligent system"</li>
+        <li>Perfectly circular layout works without cropping under all mask shapes (round, squircle, square)</li>
+        <li>Blue-to-cyan gradient (#5E72E4 → #00E5FF) connects Wave Blue brand with the app's #00E5FF primary</li>
+        <li>Concentric pulse rings are a universally recognized symbol for "active" / "broadcasting"</li>
+        <li>Notification icon (rings + center dot + cardinal ticks) works even below 16dp</li>
+        <li>If the brand evolves toward pure AI tooling, this icon is future-proof</li>
+      </ul>
+      <div style="background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.25);border-radius:10px;padding:12px 16px;margin-top:16px;">
+        <p style="font-size:12.5px;color:rgba(255,190,50,0.85);line-height:1.5;">⚠ Note: This design abandons the wave-bridge brand symbol. Consider whether the brand needs continuity before choosing this option.</p>
+      </div>
+      <div class="swatches">
+        <div class="swatch"><div class="swatch-dot" style="background:#5E72E4;"></div><span class="swatch-hex">#5E72E4 Wave Blue</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#3D9FE0;"></div><span class="swatch-hex">#3D9FE0 Mid Cyan</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#00E5FF;"></div><span class="swatch-hex">#00E5FF Cyan (app primary)</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#FFFFFF;border:1px solid rgba(255,255,255,0.2);"></div><span class="swatch-hex">#FFFFFF foreground</span></div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-item-label">Launcher size</div><div class="spec-item-value">108×108dp (adaptive)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Notification size</div><div class="spec-item-value">24×24dp vector</div></div>
+      <div class="spec-item"><div class="spec-item-label">Gradient</div><div class="spec-item-value">#5E72E4 → #00E5FF diagonal</div></div>
+      <div class="spec-item"><div class="spec-item-label">Pulse rings</div><div class="spec-item-value">3 (r=38, 28, 18)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Satellite nodes</div><div class="spec-item-value">6 nodes (constellation)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Round mask</div><div class="spec-item-value">✓ Ideal — circular design</div></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding-bottom:24px;display:flex;justify-content:center;gap:32px;">
+    <a href="alt2-bridge-signal.html" style="color:var(--wave-blue);font-weight:600;text-decoration:none;font-size:14px;">← Alt 2 · Bridge Signal</a>
+    <a href="implementation.html" style="color:var(--wave-blue);font-weight:600;text-decoration:none;font-size:14px;">View implementation guide →</a>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>NeuralBridge · Wave Bridge Design System · Alt 03 of 03</p>
+</footer>
+
+</body>
+</html>

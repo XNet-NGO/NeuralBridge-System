@@ -1,0 +1,27 @@
+<!--
+  NeuralBridge Adaptive Icon - Background Layer
+  Wave Blue-to-Purple gradient (#5E72E4 → #825EE4)
+  Matches the brand gradient defined in wave-bridge.svg source.
+  108dp canvas matching adaptive icon specifications
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:pathData="M 0 0 L 108 0 L 108 108 L 0 108 Z"
+        android:fillType="nonZero">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:startColor="#5E72E4"
+                android:endColor="#825EE4"/>
+        </aapt:attr>
+    </path>
+</vector>

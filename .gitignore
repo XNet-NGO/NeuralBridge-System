@@ -1,0 +1,188 @@
+# ==========================================
+# NeuralBridge
+# ==========================================
+
+# ------------------------------------------
+# Android / Gradle
+# ------------------------------------------
+# Gradle
+**/.gradle/
+**/.kotlin/
+**/gradle-app.setting
+!gradle-wrapper.jar
+
+# Android Studio / IntelliJ
+**/.idea/
+**/.idea/*
+!**/.idea/codeStyles/
+!**/.idea/runConfigurations/
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/gradle.xml
+**/.idea/assetWizardSettings.xml
+**/.idea/dictionaries
+**/.idea/libraries
+**/.idea/caches
+**/.idea/modules.xml
+**/.idea/*.iml
+**/.idea/modules
+**/*.iml
+**/*.ipr
+**/*.iws
+**/captures/
+**/output.json
+
+# Build outputs
+**/build/
+**/out/
+**/.cxx/
+**/.externalNativeBuild
+**/local.properties
+
+# APK/Bundle files
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.jar
+!/gradle/wrapper/gradle-wrapper.jar
+!/android/gradle/wrapper/gradle-wrapper.jar
+
+# Signing files
+*.jks
+*.keystore
+keystore.properties
+
+# NDK
+**/obj/
+**/libs/armeabi-v7a/
+**/libs/arm64-v8a/
+**/libs/x86/
+**/libs/x86_64/
+
+# ------------------------------------------
+# Protobuf Generated Files
+# ------------------------------------------
+*.pb.kt
+*.pb.java
+*_pb2.py
+*_pb2.pyi
+**/android/app/src/main/proto/
+
+# ------------------------------------------
+# Python (examples/)
+# ------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+
+# ------------------------------------------
+# IDE / Editor Files
+# ------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.project
+.classpath
+.settings/
+.factorypath
+
+# JetBrains IDEs
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# ------------------------------------------
+# OS Files
+# ------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------
+# Logs & Temporary Files
+# ------------------------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.pid
+*.seed
+*.pid.lock
+
+# ------------------------------------------
+# Claude Code (per CLAUDE.md)
+# ------------------------------------------
+.claude/scratch/
+.claude/todos.md
+.claude/teams/
+.claude/mcp.json
+.claude/hooks/
+.claude/skills/
+.claude/settings.json
+.claude/settings.local.json
+
+# Claude Code project instructions (developer-only, not for public repo)
+CLAUDE.md
+
+# Root-level MCP config (machine-specific device IDs and local paths)
+.mcp.json
+
+# ------------------------------------------
+# Demo & Test Outputs
+# ------------------------------------------
+screenshots/
+!docs/screenshots/
+recordings/*.mp4
+test-results/
+**/test_results.txt
+performance-logs/
+tests/reports/
+
+# ------------------------------------------
+# Documentation (keep source, ignore generated)
+# ------------------------------------------
+# Keep all markdown files committed
+# Ignore generated docs and internal non-markdown docs
+docs/generated/
+docs/*.html
+docs/*.pdf
+
+# ------------------------------------------
+# Miscellaneous
+# ------------------------------------------
+*.bak
+*.cache
+*.diff
+*.err
+*.orig
+*.patch
+*.rej
+.sass-cache/
+*.css.map
+*.js.map
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*

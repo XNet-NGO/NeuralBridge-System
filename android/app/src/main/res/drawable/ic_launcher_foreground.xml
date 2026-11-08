@@ -1,0 +1,77 @@
+<!--
+  NeuralBridge Adaptive Icon - Foreground Layer
+  Wave Bridge design scaled to 108dp canvas with 66dp safe zone
+
+  Original viewBox: 0 0 512 512
+  Adaptive canvas: 108×108 (66dp safe zone centered)
+  Scale factor: 108/512 ≈ 0.211
+  Offset to center in safe zone: translate(21, 21) for 66dp centered content
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:translateX="21"
+        android:translateY="21"
+        android:scaleX="0.128"
+        android:scaleY="0.128">
+
+        <!-- Main wave path (top) -->
+        <path
+            android:pathData="M 60 320 Q 130 180 200 250 T 340 250 T 452 320"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="24"
+            android:strokeLineCap="round"
+            android:fillColor="@android:color/transparent"/>
+
+        <!-- Secondary wave path (bottom, with opacity) -->
+        <path
+            android:pathData="M 60 340 Q 130 220 200 270 T 340 270 T 452 340"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="16"
+            android:strokeLineCap="round"
+            android:strokeAlpha="0.6"
+            android:fillColor="@android:color/transparent"/>
+
+        <!-- Connection nodes -->
+        <path
+            android:pathData="M 200 250 m -20, 0 a 20,20 0 1,0 40,0 a 20,20 0 1,0 -40,0"
+            android:fillColor="#FFFFFF"/>
+
+        <path
+            android:pathData="M 340 250 m -20, 0 a 20,20 0 1,0 40,0 a 20,20 0 1,0 -40,0"
+            android:fillColor="#FFFFFF"/>
+
+        <path
+            android:pathData="M 270 220 m -16, 0 a 16,16 0 1,0 32,0 a 16,16 0 1,0 -32,0"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.8"/>
+
+        <!-- Left support pillar -->
+        <path
+            android:pathData="M 60 320 L 60 400"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="20"
+            android:strokeLineCap="round"/>
+
+        <!-- Right support pillar -->
+        <path
+            android:pathData="M 452 320 L 452 400"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="20"
+            android:strokeLineCap="round"/>
+
+        <!-- Left base -->
+        <path
+            android:pathData="M 45 390 L 75 390 L 75 430 L 45 430 Z"
+            android:fillColor="#FFFFFF"/>
+
+        <!-- Right base -->
+        <path
+            android:pathData="M 437 390 L 467 390 L 467 430 L 437 430 Z"
+            android:fillColor="#FFFFFF"/>
+    </group>
+</vector>

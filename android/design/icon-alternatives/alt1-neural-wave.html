@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alt 1 · Neural Wave — NeuralBridge Icons</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .sizes-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 32px;
+    background: var(--surface-2);
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .size-label { font-size: 10px; color: var(--text-muted); text-align: center; font-family: 'JetBrains Mono', monospace; }
+  .launcher-svg { border-radius: calc(var(--size, 108px) * 0.222); box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: block; transition: transform 0.3s ease; }
+  .launcher-svg:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar fade-in-up">
+  <a href="index.html" class="nav-link">← Overview</a>
+  <a href="alt1-neural-wave.html" class="nav-link active">Alt 1 · Neural Wave</a>
+  <a href="alt2-bridge-signal.html" class="nav-link">Alt 2 · Bridge Signal</a>
+  <a href="alt3-ai-pulse.html" class="nav-link">Alt 3 · AI Pulse</a>
+  <a href="implementation.html" class="nav-link">Implementation</a>
+</nav>
+
+<header class="page-header fade-in-up-d1">
+  <div class="badge">⭐ Recommended · Alt 01</div>
+  <h1>Neural Wave</h1>
+  <p>Refined wave-bridge with tighter curves and glowing neural nodes at connection points. Fixes the gradient inconsistency by aligning to the source SVG's brand colors.</p>
+</header>
+
+<div class="container">
+
+  <!-- All sizes -->
+  <p class="section-label fade-in-up-d1">Launcher icon — all adaptive sizes</p>
+  <div class="sizes-row fade-in-up-d2">
+
+    <!-- 192×192 (xxxhdpi) -->
+    <div class="size-item">
+      <svg width="96" height="96" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nw-a1-lg" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#825EE4"/>
+          </linearGradient>
+          <filter id="f-nw-a1"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="108" height="108" fill="url(#nw-a1-lg)"/>
+        <circle cx="90" cy="18" r="36" fill="rgba(255,255,255,0.04)"/>
+        <circle cx="18" cy="90" r="28" fill="rgba(0,0,0,0.12)"/>
+        <path d="M 12 52 C 28 38, 46 42, 54 46 C 62 50, 80 56, 96 42" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" opacity="0.95"/>
+        <path d="M 12 64 C 28 50, 46 54, 54 58 C 62 62, 80 68, 96 54" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+        <line x1="36" y1="46" x2="36" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="72" y1="50" x2="72" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <rect x="28" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <rect x="64" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <circle cx="36" cy="44" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1)"/><circle cx="36" cy="44" r="3.5" fill="white"/>
+        <circle cx="54" cy="46" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1)"/><circle cx="54" cy="46" r="3.5" fill="white"/>
+        <circle cx="72" cy="48" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1)"/><circle cx="72" cy="48" r="3.5" fill="white"/>
+        <line x1="36" y1="44" x2="54" y2="46" stroke="white" stroke-width="0.8" opacity="0.35"/>
+        <line x1="54" y1="46" x2="72" y2="48" stroke="white" stroke-width="0.8" opacity="0.35"/>
+        <circle cx="20" cy="54" r="1.5" fill="white" opacity="0.5"/>
+        <circle cx="88" cy="44" r="1.5" fill="white" opacity="0.5"/>
+      </svg>
+      <span class="size-label">96px preview<br>(xxxhdpi ÷2)</span>
+    </div>
+
+    <!-- 72×72 (hdpi) -->
+    <div class="size-item">
+      <svg width="72" height="72" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="nw-a1-m" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#825EE4"/></linearGradient><filter id="f-nw-a1-m"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <rect width="108" height="108" fill="url(#nw-a1-m)"/>
+        <circle cx="90" cy="18" r="36" fill="rgba(255,255,255,0.04)"/>
+        <path d="M 12 52 C 28 38, 46 42, 54 46 C 62 50, 80 56, 96 42" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" opacity="0.95"/>
+        <path d="M 12 64 C 28 50, 46 54, 54 58 C 62 62, 80 68, 96 54" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+        <line x1="36" y1="46" x2="36" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="72" y1="50" x2="72" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <rect x="28" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <rect x="64" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <circle cx="36" cy="44" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-m)"/><circle cx="36" cy="44" r="3.5" fill="white"/>
+        <circle cx="54" cy="46" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-m)"/><circle cx="54" cy="46" r="3.5" fill="white"/>
+        <circle cx="72" cy="48" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-m)"/><circle cx="72" cy="48" r="3.5" fill="white"/>
+        <line x1="36" y1="44" x2="54" y2="46" stroke="white" stroke-width="0.8" opacity="0.35"/>
+        <line x1="54" y1="46" x2="72" y2="48" stroke="white" stroke-width="0.8" opacity="0.35"/>
+      </svg>
+      <span class="size-label">72px<br>(hdpi)</span>
+    </div>
+
+    <!-- 48×48 (mdpi) -->
+    <div class="size-item">
+      <svg width="48" height="48" viewBox="0 0 108 108" class="launcher-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="nw-a1-s" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#825EE4"/></linearGradient></defs>
+        <rect width="108" height="108" fill="url(#nw-a1-s)"/>
+        <path d="M 12 52 C 28 38, 46 42, 54 46 C 62 50, 80 56, 96 42" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.95"/>
+        <path d="M 12 64 C 28 50, 46 54, 54 58 C 62 62, 80 68, 96 54" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+        <line x1="36" y1="46" x2="36" y2="80" stroke="white" stroke-width="3" opacity="0.7"/>
+        <line x1="72" y1="50" x2="72" y2="80" stroke="white" stroke-width="3" opacity="0.7"/>
+        <circle cx="36" cy="44" r="5" fill="white"/>
+        <circle cx="54" cy="46" r="5" fill="white"/>
+        <circle cx="72" cy="48" r="5" fill="white"/>
+      </svg>
+      <span class="size-label">48px<br>(mdpi)</span>
+    </div>
+
+    <!-- Round variant -->
+    <div class="size-item">
+      <svg width="96" height="96" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%;box-shadow:0 8px 32px rgba(0,0,0,0.5);display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''">
+        <defs><linearGradient id="nw-a1-r" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5E72E4"/><stop offset="100%" stop-color="#825EE4"/></linearGradient><filter id="f-nw-a1-r"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <rect width="108" height="108" fill="url(#nw-a1-r)"/>
+        <circle cx="90" cy="18" r="36" fill="rgba(255,255,255,0.04)"/>
+        <path d="M 12 52 C 28 38, 46 42, 54 46 C 62 50, 80 56, 96 42" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" opacity="0.95"/>
+        <path d="M 12 64 C 28 50, 46 54, 54 58 C 62 62, 80 68, 96 54" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+        <line x1="36" y1="46" x2="36" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="72" y1="50" x2="72" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <rect x="28" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <rect x="64" y="78" width="16" height="4" rx="2" fill="white" opacity="0.7"/>
+        <circle cx="36" cy="44" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-r)"/><circle cx="36" cy="44" r="3.5" fill="white"/>
+        <circle cx="54" cy="46" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-r)"/><circle cx="54" cy="46" r="3.5" fill="white"/>
+        <circle cx="72" cy="48" r="5.5" fill="rgba(255,255,255,0.2)" filter="url(#f-nw-a1-r)"/><circle cx="72" cy="48" r="3.5" fill="white"/>
+      </svg>
+      <span class="size-label">Round variant<br>(ic_launcher_round)</span>
+    </div>
+
+  </div><!-- /sizes-row -->
+
+  <!-- Notification preview -->
+  <p class="section-label fade-in-up-d2">Notification icon — monochrome</p>
+  <div class="card fade-in-up-d3" style="margin-bottom:24px;">
+    <div class="preview-stage">
+      <div class="preview-item">
+        <div class="preview-label">24dp on status bar</div>
+        <div style="background:#1C1C2E;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+          <svg width="28" height="28" viewBox="0 0 24 24">
+            <path d="M 3 12 C 7 8, 11 10, 12 12 C 13 14, 17 16, 21 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="7.5"  cy="10.5" r="1.8" fill="white"/>
+            <circle cx="12"   cy="12"   r="1.8" fill="white"/>
+            <circle cx="16.5" cy="11"   r="1.8" fill="white"/>
+          </svg>
+        </div>
+        <p class="notif-ok">✓ Monochrome — Android compliant</p>
+      </div>
+      <div class="preview-divider"></div>
+      <div class="preview-item">
+        <div class="preview-label">Notification shade</div>
+        <div class="notif-bar">
+          <div class="notif-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path d="M 3 12 C 7 8, 11 10, 12 12 C 13 14, 17 16, 21 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="7.5"  cy="10.5" r="1.8" fill="white"/>
+              <circle cx="12"   cy="12"   r="1.8" fill="white"/>
+              <circle cx="16.5" cy="11"   r="1.8" fill="white"/>
+            </svg>
+          </div>
+          <div><div class="notif-title">NeuralBridge</div><div class="notif-sub">Automation active</div></div>
+        </div>
+        <p class="notif-ok">✓ Reads at 20px</p>
+      </div>
+      <div class="preview-divider"></div>
+      <div class="preview-item">
+        <div class="preview-label">Oversized (scalability)</div>
+        <div style="background:#1C1C2E;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+          <svg width="64" height="64" viewBox="0 0 24 24">
+            <path d="M 3 12 C 7 8, 11 10, 12 12 C 13 14, 17 16, 21 12" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="7.5"  cy="10.5" r="1.8" fill="white"/>
+            <circle cx="12"   cy="12"   r="1.8" fill="white"/>
+            <circle cx="16.5" cy="11"   r="1.8" fill="white"/>
+          </svg>
+        </div>
+        <p class="notif-ok">✓ Vector scales cleanly</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rationale + swatches -->
+  <div class="card fade-in-up-d3" style="margin-bottom:48px;">
+    <div class="card-body">
+      <p class="rationale-label">Design Rationale</p>
+      <p class="rationale-text">Refines the existing wave-bridge concept with the correct brand gradient (#5E72E4 → #825EE4), aligning to the source <code>wave-bridge.svg</code>. Neural nodes are added at the three pillar-tops to reinforce the AI identity without introducing a brand redesign.</p>
+      <ul class="rationale-points">
+        <li>Minimal change — stakeholders recognize the existing brand symbol</li>
+        <li>Gradient fix resolves the inconsistency between SVG source and background XML</li>
+        <li>Glowing nodes visually communicate AI/neural processing</li>
+        <li>Notification icon (single wave arc + 3 dots) is legible even at 16dp</li>
+        <li>Lowest implementation cost — update gradient stops + add 3 circle elements</li>
+      </ul>
+      <div class="swatches">
+        <div class="swatch"><div class="swatch-dot" style="background:#5E72E4;"></div><span class="swatch-hex">#5E72E4 Wave Blue (start)</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#825EE4;"></div><span class="swatch-hex">#825EE4 Wave Purple (end)</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#FFFFFF;border:1px solid rgba(255,255,255,0.2);"></div><span class="swatch-hex">#FFFFFF foreground</span></div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-item-label">Launcher size</div><div class="spec-item-value">108×108dp (adaptive)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Notification size</div><div class="spec-item-value">24×24dp vector</div></div>
+      <div class="spec-item"><div class="spec-item-label">Gradient</div><div class="spec-item-value">#5E72E4 → #825EE4 diagonal</div></div>
+      <div class="spec-item"><div class="spec-item-label">Foreground color</div><div class="spec-item-value">#FFFFFF (all paths)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Node count</div><div class="spec-item-value">3 (left, center, right)</div></div>
+      <div class="spec-item"><div class="spec-item-label">Background corner</div><div class="spec-item-value">~30% via round mask</div></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding-bottom:24px;">
+    <a href="alt2-bridge-signal.html" style="color:var(--wave-blue);font-weight:600;text-decoration:none;font-size:14px;">Next: Alt 2 · Bridge Signal →</a>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>NeuralBridge · Wave Bridge Design System · Alt 01 of 03</p>
+</footer>
+
+</body>
+</html>

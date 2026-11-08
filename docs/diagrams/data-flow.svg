@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" fill="none">
+  <defs>
+    <linearGradient id="dfStep1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+    <linearGradient id="dfStep2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="dfStep3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="dfStep4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <filter id="dfShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="320" rx="16" fill="#FAFBFC"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700">What happens when you say "tap Login"</text>
+
+  <!-- Step 1: Agent -->
+  <rect x="30" y="60" width="185" height="170" rx="12" fill="url(#dfStep1)" filter="url(#dfShadow)"/>
+  <rect x="38" y="64" width="24" height="24" rx="12" fill="white" fill-opacity="0.25"/>
+  <text x="50" y="82" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="13" font-weight="700">1</text>
+  <text x="75" y="82" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600">AGENT SENDS</text>
+
+  <rect x="44" y="96" width="157" height="120" rx="8" fill="white"/>
+  <text x="122" y="120" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">MCP Tool Call</text>
+  <line x1="60" y1="130" x2="186" y2="130" stroke="#E2E8F0" stroke-width="1"/>
+  <rect x="56" y="140" width="133" height="32" rx="4" fill="#1E293B"/>
+  <text x="122" y="161" text-anchor="middle" fill="#A5B4FC" font-family="ui-monospace, monospace" font-size="11">tap(text="Login")</text>
+  <rect x="56" y="180" width="133" height="26" rx="13" fill="#EEF2FF"/>
+  <text x="122" y="197" text-anchor="middle" fill="#4F46E5" font-family="system-ui, sans-serif" font-size="11" font-weight="600">HTTP &lt;5ms</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="215" y1="145" x2="252" y2="145" stroke="#94A3B8" stroke-width="2"/>
+  <polygon points="248,140 258,145 248,150" fill="#94A3B8"/>
+
+  <!-- Step 2: Companion resolves -->
+  <rect x="260" y="60" width="185" height="170" rx="12" fill="url(#dfStep2)" filter="url(#dfShadow)"/>
+  <rect x="268" y="64" width="24" height="24" rx="12" fill="white" fill-opacity="0.25"/>
+  <text x="280" y="82" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="13" font-weight="700">2</text>
+  <text x="305" y="82" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600">RESOLVE &amp; EXECUTE</text>
+
+  <rect x="274" y="96" width="157" height="120" rx="8" fill="white"/>
+  <text x="352" y="120" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">Companion App</text>
+  <line x1="290" y1="130" x2="416" y2="130" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="352" y="150" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="11">"Login" found at</text>
+  <text x="352" y="168" text-anchor="middle" fill="#059669" font-family="ui-monospace, monospace" font-size="13" font-weight="700">(540, 820)</text>
+  <rect x="290" y="180" width="125" height="26" rx="13" fill="#F0FDF4"/>
+  <text x="352" y="197" text-anchor="middle" fill="#059669" font-family="system-ui, sans-serif" font-size="11" font-weight="600">dispatchGesture</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="445" y1="192" x2="482" y2="258" stroke="#94A3B8" stroke-width="2"/>
+  <polygon points="476,256 486,262 480,252" fill="#94A3B8"/>
+
+  <!-- Step 3: Android OS -->
+  <rect x="490" y="240" width="170" height="60" rx="12" fill="url(#dfStep3)" filter="url(#dfShadow)"/>
+  <rect x="498" y="244" width="24" height="24" rx="12" fill="white" fill-opacity="0.25"/>
+  <text x="510" y="262" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="13" font-weight="700">3</text>
+  <text x="540" y="262" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600">OS PROCESSES</text>
+  <text x="575" y="285" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="12" fill-opacity="0.85">Tap at (540, 820)</text>
+
+  <!-- Arrow 2→4 (response) -->
+  <line x1="445" y1="145" x2="490" y2="145" stroke="#94A3B8" stroke-width="2"/>
+  <polygon points="486,140 496,145 486,150" fill="#94A3B8"/>
+  <text x="468" y="137" text-anchor="middle" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="9">&lt;1ms</text>
+
+  <!-- Step 4: Response -->
+  <rect x="498" y="60" width="185" height="170" rx="12" fill="url(#dfStep4)" filter="url(#dfShadow)"/>
+  <rect x="506" y="64" width="24" height="24" rx="12" fill="white" fill-opacity="0.25"/>
+  <text x="518" y="82" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="13" font-weight="700">4</text>
+  <text x="543" y="82" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600">RESPONSE</text>
+
+  <rect x="512" y="96" width="157" height="120" rx="8" fill="white"/>
+  <text x="590" y="120" text-anchor="middle" fill="#1E293B" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">Agent Receives</text>
+  <line x1="528" y1="130" x2="654" y2="130" stroke="#E2E8F0" stroke-width="1"/>
+  <rect x="524" y="140" width="145" height="32" rx="4" fill="#1E293B"/>
+  <text x="596" y="161" text-anchor="middle" fill="#C4B5FD" font-family="ui-monospace, monospace" font-size="11">"tapped at (540,820)"</text>
+  <rect x="544" y="180" width="93" height="26" rx="13" fill="#EDE9FE"/>
+  <text x="590" y="197" text-anchor="middle" fill="#7C3AED" font-family="system-ui, sans-serif" font-size="11" font-weight="600">HTTP &lt;1ms</text>
+
+  <!-- Total time badge -->
+  <rect x="710" y="100" width="170" height="80" rx="12" fill="white" stroke="#E2E8F0" stroke-width="1" filter="url(#dfShadow)"/>
+  <text x="795" y="128" text-anchor="middle" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500">Total end-to-end</text>
+  <text x="795" y="158" text-anchor="middle" fill="#059669" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="800">~60ms</text>
+  <text x="795" y="174" text-anchor="middle" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="10">vs ~1500ms with Appium</text>
+</svg>

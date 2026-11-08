@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuralBridge Companion App - Design Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #111; color: #eee; }
+
+  /* Nav */
+  .tab-bar { position: sticky; top: 0; z-index: 100; display: flex; background: #000; border-bottom: 1px solid #333; }
+  .tab-bar button { flex: 1; padding: 16px; border: none; background: none; color: #888; font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; }
+  .tab-bar button.active { color: #fff; }
+  .tab-bar button[data-tab="1"].active { border-color: #22C55E; color: #22C55E; }
+  .tab-bar button[data-tab="2"].active { border-color: #6366F1; color: #6366F1; }
+  .tab-bar button[data-tab="3"].active { border-color: #00FFFF; color: #00FFFF; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Phone frame */
+  .phone-row { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; padding: 40px 20px; }
+  .phone-frame { width: 375px; height: 812px; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,.5); position: relative; flex-shrink: 0; }
+  .phone-frame .screen { width: 100%; height: 100%; overflow-y: auto; }
+  .phone-frame .screen::-webkit-scrollbar { width: 0; }
+
+  /* Section header */
+  .section-title { text-align: center; padding: 48px 20px 0; }
+  .section-title h1 { font-size: 32px; margin-bottom: 8px; }
+  .section-title p { color: #888; font-size: 15px; max-width: 600px; margin: 0 auto; }
+
+  /* Palette strip */
+  .palette { display: flex; justify-content: center; gap: 12px; padding: 24px; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 12px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-size: 10px; font-family: 'Fira Code', monospace; border: 1px solid rgba(255,255,255,.1); }
+
+  /* Typography preview */
+  .type-preview { text-align: center; padding: 24px 32px; }
+  .type-preview .heading-font { font-size: 28px; margin-bottom: 8px; }
+  .type-preview .body-font { font-size: 15px; color: #aaa; line-height: 1.6; }
+
+  /* Info cards below phone */
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+  .info-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; }
+  .info-card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
+  .info-card ul { list-style: none; }
+  .info-card li { padding: 4px 0; font-size: 14px; color: #ccc; }
+  .info-card li span { color: #888; }
+
+  /* ===================== OPTION 1: DARK TERMINAL ===================== */
+  .opt1-screen { background: #0F172A; color: #F8FAFC; font-family: 'Fira Sans', sans-serif; }
+  .opt1-status-bar { display: flex; justify-content: space-between; padding: 12px 20px 8px; font-size: 12px; color: #94A3B8; font-family: 'Fira Code', monospace; }
+  .opt1-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .opt1-header h1 { font-family: 'Fira Code', monospace; font-size: 18px; font-weight: 600; }
+  .opt1-header .dot { width: 10px; height: 10px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E80; }
+  .opt1-conn-card { margin: 0 16px 12px; background: #1E293B; border-radius: 12px; padding: 16px; border: 1px solid #334155; }
+  .opt1-conn-card .label { font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 1px; font-family: 'Fira Code', monospace; margin-bottom: 8px; }
+  .opt1-conn-card .status-row { display: flex; align-items: center; gap: 8px; }
+  .opt1-conn-card .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .opt1-conn-card .status-dot.green { background: #22C55E; box-shadow: 0 0 6px #22C55E80; }
+  .opt1-conn-card .status-dot.red { background: #EF4444; box-shadow: 0 0 6px #EF444480; }
+  .opt1-conn-card .status-text { font-size: 14px; font-weight: 500; }
+  .opt1-conn-card .meta { font-size: 12px; color: #64748B; margin-top: 4px; font-family: 'Fira Code', monospace; }
+  .opt1-section-label { padding: 20px 20px 8px; font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Fira Code', monospace; }
+  .opt1-perm-list { padding: 0 16px; }
+  .opt1-perm-item { display: flex; align-items: center; justify-content: space-between; background: #1E293B; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; border: 1px solid #334155; }
+  .opt1-perm-item .left { display: flex; align-items: center; gap: 10px; }
+  .opt1-perm-item .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .opt1-perm-item .name { font-size: 14px; font-weight: 500; }
+  .opt1-perm-item .desc { font-size: 11px; color: #64748B; }
+  .opt1-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'Fira Code', monospace; }
+  .opt1-badge.granted { background: #22C55E20; color: #22C55E; }
+  .opt1-badge.denied { background: #EF444420; color: #EF4444; }
+  .opt1-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 16px; }
+  .opt1-stat { background: #1E293B; border-radius: 10px; padding: 14px; border: 1px solid #334155; text-align: center; }
+  .opt1-stat .value { font-family: 'Fira Code', monospace; font-size: 22px; font-weight: 700; color: #22C55E; }
+  .opt1-stat .unit { font-size: 11px; color: #64748B; margin-top: 2px; }
+  .opt1-log { margin: 0 16px 20px; background: #0D1117; border-radius: 10px; padding: 12px; font-family: 'Fira Code', monospace; font-size: 11px; line-height: 1.8; border: 1px solid #21262D; }
+  .opt1-log .ts { color: #484F58; }
+  .opt1-log .ok { color: #22C55E; }
+  .opt1-log .info { color: #3B82F6; }
+  .opt1-log .warn { color: #F59E0B; }
+
+  /* ===================== OPTION 2: TECH INDIGO ===================== */
+  .opt2-screen { background: #1E1B4B; color: #F8FAFC; font-family: 'DM Sans', sans-serif; }
+  .opt2-status-bar { display: flex; justify-content: space-between; padding: 12px 20px 8px; font-size: 12px; color: #818CF8; }
+  .opt2-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .opt2-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
+  .opt2-header .pill { background: #10B98130; color: #10B981; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .opt2-hero { margin: 0 16px 16px; background: linear-gradient(135deg, #6366F1, #818CF8); border-radius: 20px; padding: 24px 20px; position: relative; overflow: hidden; }
+  .opt2-hero::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.1); }
+  .opt2-hero .device-name { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+  .opt2-hero .device-info { font-size: 13px; opacity: .8; margin-top: 4px; }
+  .opt2-hero .stats-row { display: flex; gap: 20px; margin-top: 16px; }
+  .opt2-hero .stat { text-align: center; }
+  .opt2-hero .stat .val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
+  .opt2-hero .stat .lbl { font-size: 11px; opacity: .7; }
+  .opt2-section-label { padding: 8px 20px; font-size: 12px; color: #818CF8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .opt2-card-list { padding: 0 16px; }
+  .opt2-card { background: #312E81; border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #4338CA40; }
+  .opt2-card .left { display: flex; align-items: center; gap: 12px; }
+  .opt2-card .ico { width: 40px; height: 40px; border-radius: 12px; background: #6366F130; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .opt2-card .title { font-weight: 600; font-size: 14px; }
+  .opt2-card .sub { font-size: 12px; color: #A5B4FC; }
+  .opt2-toggle { width: 44px; height: 24px; border-radius: 12px; position: relative; cursor: pointer; }
+  .opt2-toggle.on { background: #10B981; }
+  .opt2-toggle.off { background: #4B5563; }
+  .opt2-toggle::after { content: ''; width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; transition: .2s; }
+  .opt2-toggle.on::after { left: 22px; }
+  .opt2-toggle.off::after { left: 2px; }
+  .opt2-quick-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 8px 16px 20px; }
+  .opt2-action { background: #312E81; border-radius: 16px; padding: 16px 8px; text-align: center; border: 1px solid #4338CA40; }
+  .opt2-action .ico { font-size: 24px; margin-bottom: 6px; }
+  .opt2-action .lbl { font-size: 11px; color: #C7D2FE; font-weight: 500; }
+
+  /* ===================== OPTION 3: CYBERPUNK HUD ===================== */
+  .opt3-screen { background: #0D0D0D; color: #E0E0E0; font-family: 'Share Tech Mono', monospace; }
+  .opt3-status-bar { display: flex; justify-content: space-between; padding: 12px 16px 8px; font-size: 11px; color: #00FFFF80; }
+  .opt3-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #00FFFF20; }
+  .opt3-header h1 { font-size: 16px; color: #00FFFF; text-shadow: 0 0 10px #00FFFF40; letter-spacing: 2px; }
+  .opt3-header .sig { font-size: 10px; color: #FF00FF; text-shadow: 0 0 8px #FF00FF40; }
+  .opt3-hud-panel { margin: 12px; border: 1px solid #00FFFF30; border-radius: 4px; background: #0D0D0D; position: relative; }
+  .opt3-hud-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #00FFFF, transparent); }
+  .opt3-hud-label { font-size: 10px; color: #00FFFF; padding: 8px 12px 4px; letter-spacing: 2px; text-transform: uppercase; }
+  .opt3-hud-content { padding: 4px 12px 12px; }
+  .opt3-device-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #00FFFF15; }
+  .opt3-device-cell { background: #0D0D0D; padding: 10px; }
+  .opt3-device-cell .label { font-size: 9px; color: #00FFFF60; text-transform: uppercase; letter-spacing: 1px; }
+  .opt3-device-cell .val { font-size: 14px; color: #00FFFF; margin-top: 2px; }
+  .opt3-conn-status { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+  .opt3-pulse { width: 10px; height: 10px; border-radius: 50%; background: #00FF00; box-shadow: 0 0 12px #00FF00; animation: pulse3 1.5s infinite; }
+  @keyframes pulse3 { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+  .opt3-conn-text { font-size: 13px; color: #00FF00; text-shadow: 0 0 6px #00FF0040; }
+  .opt3-perm-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-top: 1px solid #00FFFF10; }
+  .opt3-perm-name { font-size: 12px; }
+  .opt3-perm-status { font-size: 11px; padding: 2px 8px; border-radius: 2px; }
+  .opt3-perm-status.ok { color: #00FF00; border: 1px solid #00FF0040; background: #00FF0010; }
+  .opt3-perm-status.no { color: #FF00FF; border: 1px solid #FF00FF40; background: #FF00FF10; }
+  .opt3-metric-bar { display: flex; gap: 8px; padding: 0 12px 12px; }
+  .opt3-metric { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #00FFFF20; border-radius: 2px; }
+  .opt3-metric .num { font-size: 20px; color: #00FFFF; text-shadow: 0 0 8px #00FFFF40; }
+  .opt3-metric .lbl { font-size: 9px; color: #00FFFF60; margin-top: 4px; text-transform: uppercase; }
+  .opt3-log { margin: 0 12px 16px; border: 1px solid #00FFFF20; border-radius: 2px; padding: 10px; font-size: 11px; line-height: 1.9; background: #050505; }
+  .opt3-log .cyan { color: #00FFFF; }
+  .opt3-log .green { color: #00FF00; }
+  .opt3-log .magenta { color: #FF00FF; }
+  .opt3-log .dim { color: #444; }
+  .opt3-scanline { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,.015) 2px, rgba(0,255,255,.015) 4px); pointer-events: none; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button data-tab="1" class="active">Option 1: Dark Terminal</button>
+  <button data-tab="2">Option 2: Tech Indigo</button>
+  <button data-tab="3">Option 3: Cyberpunk HUD</button>
+</div>
+
+<!-- ==================== OPTION 1 ==================== -->
+<div class="tab-content active" id="tab1">
+  <div class="section-title">
+    <h1 style="font-family:'Fira Code',monospace; color:#22C55E;">Dark Terminal</h1>
+    <p>Developer-first. OLED-optimized. Green = active, Red = error. Fira Code + Fira Sans.</p>
+  </div>
+  <div class="palette">
+    <div class="swatch" style="background:#0F172A; color:#94A3B8;">#0F172A</div>
+    <div class="swatch" style="background:#1E293B; color:#94A3B8;">#1E293B</div>
+    <div class="swatch" style="background:#22C55E; color:#0F172A;">#22C55E</div>
+    <div class="swatch" style="background:#3B82F6; color:#fff;">#3B82F6</div>
+    <div class="swatch" style="background:#EF4444; color:#fff;">#EF4444</div>
+    <div class="swatch" style="background:#F8FAFC; color:#0F172A;">#F8FAFC</div>
+  </div>
+  <div class="phone-row">
+    <div class="phone-frame" style="border: 2px solid #334155;">
+      <div class="screen opt1-screen">
+        <div class="opt1-status-bar"><span>12:45</span><span>LTE &nbsp; 87%</span></div>
+        <div class="opt1-header">
+          <h1>NeuralBridge</h1>
+          <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:12px;color:#22C55E;font-family:'Fira Code',monospace;">ONLINE</span><div class="dot"></div></div>
+        </div>
+
+        <div class="opt1-conn-card">
+          <div class="label">Connection</div>
+          <div class="status-row"><div class="status-dot green"></div><span class="status-text">Connected to MCP Server</span></div>
+          <div class="meta">tcp://localhost:38472 &bull; 3ms latency</div>
+        </div>
+        <div class="opt1-conn-card">
+          <div class="label">Device</div>
+          <div class="status-row"><div class="status-dot green"></div><span class="status-text">Pixel 8 Pro</span></div>
+          <div class="meta">Android 15 &bull; API 35 &bull; emulator-5554</div>
+        </div>
+
+        <div class="opt1-section-label">Performance</div>
+        <div class="opt1-stats">
+          <div class="opt1-stat"><div class="value">3ms</div><div class="unit">Latency (P50)</div></div>
+          <div class="opt1-stat"><div class="value">847</div><div class="unit">Commands / hr</div></div>
+          <div class="opt1-stat"><div class="value" style="color:#3B82F6;">1.2k</div><div class="unit">UI Nodes</div></div>
+          <div class="opt1-stat"><div class="value" style="color:#F59E0B;">62ms</div><div class="unit">Screenshot</div></div>
+        </div>
+
+        <div class="opt1-section-label">Permissions</div>
+        <div class="opt1-perm-list">
+          <div class="opt1-perm-item">
+            <div class="left">
+              <div class="icon" style="background:#22C55E20; color:#22C55E;">A</div>
+              <div><div class="name">Accessibility Service</div><div class="desc">UI tree & gesture injection</div></div>
+            </div>
+            <span class="opt1-badge granted">GRANTED</span>
+          </div>
+          <div class="opt1-perm-item">
+            <div class="left">
+              <div class="icon" style="background:#22C55E20; color:#22C55E;">M</div>
+              <div><div class="name">Media Projection</div><div class="desc">Screenshot capture</div></div>
+            </div>
+            <span class="opt1-badge granted">GRANTED</span>
+          </div>
+          <div class="opt1-perm-item">
+            <div class="left">
+              <div class="icon" style="background:#EF444420; color:#EF4444;">N</div>
+              <div><div class="name">Notification Listener</div><div class="desc">Read notifications</div></div>
+            </div>
+            <span class="opt1-badge denied">DENIED</span>
+          </div>
+        </div>
+
+        <div class="opt1-section-label">Event Log</div>
+        <div class="opt1-log">
+          <div><span class="ts">12:45:02</span> <span class="ok">OK</span> tap(text="Settings") 4ms</div>
+          <div><span class="ts">12:45:01</span> <span class="info">UI</span> get_ui_tree 847 nodes</div>
+          <div><span class="ts">12:45:00</span> <span class="ok">OK</span> screenshot 62ms</div>
+          <div><span class="ts">12:44:58</span> <span class="warn">!!</span> MediaProjection warm-up</div>
+          <div><span class="ts">12:44:55</span> <span class="ok">OK</span> launch_app(chrome)</div>
+          <div><span class="ts">12:44:50</span> <span class="info">--</span> MCP connected</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:400px; padding-top:20px;">
+      <div class="type-preview">
+        <div class="heading-font" style="font-family:'Fira Code',monospace; color:#22C55E;">Fira Code 700</div>
+        <div class="heading-font" style="font-family:'Fira Sans',sans-serif; font-weight:600; font-size:22px; color:#F8FAFC;">Fira Sans 600</div>
+        <div class="body-font" style="font-family:'Fira Sans',sans-serif; color:#94A3B8; margin-top:12px;">
+          Body text in Fira Sans 400. Clean and readable at small sizes. Pairs naturally with Fira Code for a cohesive developer experience.
+        </div>
+      </div>
+      <div class="info-grid" style="padding:20px 0;">
+        <div class="info-card">
+          <h3>Why This Works</h3>
+          <ul>
+            <li>Green/red = instant status recognition</li>
+            <li>OLED black saves battery</li>
+            <li>Monospace = developer credibility</li>
+            <li>WCAG AAA contrast ratios</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>Specs</h3>
+          <ul>
+            <li><span>Corner radius:</span> 12dp cards, 8dp btns</li>
+            <li><span>Spacing:</span> 8dp grid</li>
+            <li><span>Elevation:</span> Flat + border</li>
+            <li><span>Icons:</span> Lucide (outlined)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 2 ==================== -->
+<div class="tab-content" id="tab2">
+  <div class="section-title">
+    <h1 style="font-family:'Space Grotesk',sans-serif; color:#818CF8;">Tech Indigo</h1>
+    <p>Modern SaaS aesthetic. Indigo signals intelligence. Space Grotesk + DM Sans. Light & dark modes.</p>
+  </div>
+  <div class="palette">
+    <div class="swatch" style="background:#1E1B4B; color:#C7D2FE;">#1E1B4B</div>
+    <div class="swatch" style="background:#312E81; color:#C7D2FE;">#312E81</div>
+    <div class="swatch" style="background:#6366F1; color:#fff;">#6366F1</div>
+    <div class="swatch" style="background:#818CF8; color:#1E1B4B;">#818CF8</div>
+    <div class="swatch" style="background:#10B981; color:#fff;">#10B981</div>
+    <div class="swatch" style="background:#F8FAFC; color:#1E1B4B;">#F8FAFC</div>
+  </div>
+  <div class="phone-row">
+    <div class="phone-frame" style="border: 2px solid #4338CA;">
+      <div class="screen opt2-screen">
+        <div class="opt2-status-bar"><span>12:45</span><span>5G &nbsp; 92%</span></div>
+        <div class="opt2-header">
+          <h1>NeuralBridge</h1>
+          <div class="pill">Connected</div>
+        </div>
+
+        <div class="opt2-hero">
+          <div class="device-name">Pixel 8 Pro</div>
+          <div class="device-info">Android 15 &bull; API 35 &bull; emulator-5554</div>
+          <div class="stats-row">
+            <div class="stat"><div class="val">3ms</div><div class="lbl">Latency</div></div>
+            <div class="stat"><div class="val">847</div><div class="lbl">Cmds/hr</div></div>
+            <div class="stat"><div class="val">99.8%</div><div class="lbl">Uptime</div></div>
+          </div>
+        </div>
+
+        <div class="opt2-section-label">Quick Actions</div>
+        <div class="opt2-quick-actions">
+          <div class="opt2-action"><div class="ico">&#9881;</div><div class="lbl">Settings</div></div>
+          <div class="opt2-action"><div class="ico">&#9694;</div><div class="lbl">Screenshot</div></div>
+          <div class="opt2-action"><div class="ico">&#9638;</div><div class="lbl">UI Tree</div></div>
+        </div>
+
+        <div class="opt2-section-label">Services</div>
+        <div class="opt2-card-list">
+          <div class="opt2-card">
+            <div class="left">
+              <div class="ico" style="background:#10B98130;">A</div>
+              <div><div class="title">Accessibility</div><div class="sub">UI observation & gestures</div></div>
+            </div>
+            <div class="opt2-toggle on"></div>
+          </div>
+          <div class="opt2-card">
+            <div class="left">
+              <div class="ico" style="background:#10B98130;">M</div>
+              <div><div class="title">Media Projection</div><div class="sub">Screen capture</div></div>
+            </div>
+            <div class="opt2-toggle on"></div>
+          </div>
+          <div class="opt2-card">
+            <div class="left">
+              <div class="ico" style="background:#EF444430;">N</div>
+              <div><div class="title">Notifications</div><div class="sub">Not enabled</div></div>
+            </div>
+            <div class="opt2-toggle off"></div>
+          </div>
+          <div class="opt2-card">
+            <div class="left">
+              <div class="ico" style="background:#10B98130;">T</div>
+              <div><div class="title">TCP Server</div><div class="sub">Port 38472</div></div>
+            </div>
+            <div class="opt2-toggle on"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:400px; padding-top:20px;">
+      <div class="type-preview">
+        <div class="heading-font" style="font-family:'Space Grotesk',sans-serif; color:#818CF8;">Space Grotesk 700</div>
+        <div class="heading-font" style="font-family:'DM Sans',sans-serif; font-weight:500; font-size:22px; color:#F8FAFC;">DM Sans 500</div>
+        <div class="body-font" style="font-family:'DM Sans',sans-serif; color:#A5B4FC; margin-top:12px;">
+          Body text in DM Sans 400. Geometric yet friendly. Highly readable at all sizes. Space Grotesk adds a distinctive tech edge to headings.
+        </div>
+      </div>
+      <div class="info-grid" style="padding:20px 0;">
+        <div class="info-card">
+          <h3>Why This Works</h3>
+          <ul>
+            <li>Indigo = intelligence / AI</li>
+            <li>Aligns with Wave Bridge palette</li>
+            <li>Gradient hero card = visual anchor</li>
+            <li>Toggle switches = familiar pattern</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>Specs</h3>
+          <ul>
+            <li><span>Corner radius:</span> 16dp cards, 20dp hero</li>
+            <li><span>Spacing:</span> 8dp grid</li>
+            <li><span>Elevation:</span> Subtle + gradient</li>
+            <li><span>Icons:</span> Material Symbols</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 3 ==================== -->
+<div class="tab-content" id="tab3">
+  <div class="section-title">
+    <h1 style="font-family:'Share Tech Mono',monospace; color:#00FFFF; text-shadow:0 0 15px #00FFFF40;">Cyberpunk HUD</h1>
+    <p>Sci-fi control panel. Neon accents on pure black. Maximum visual impact. Share Tech Mono + Fira Code.</p>
+  </div>
+  <div class="palette">
+    <div class="swatch" style="background:#0D0D0D; color:#444; border-color:#333;">#0D0D0D</div>
+    <div class="swatch" style="background:#1A1A2E; color:#00FFFF80; border-color:#00FFFF30;">#1A1A2E</div>
+    <div class="swatch" style="background:#00FFFF; color:#0D0D0D;">#00FFFF</div>
+    <div class="swatch" style="background:#FF00FF; color:#0D0D0D;">#FF00FF</div>
+    <div class="swatch" style="background:#00FF00; color:#0D0D0D;">#00FF00</div>
+    <div class="swatch" style="background:#E0E0E0; color:#0D0D0D;">#E0E0E0</div>
+  </div>
+  <div class="phone-row">
+    <div class="phone-frame" style="border: 2px solid #00FFFF40;">
+      <div class="screen opt3-screen" style="position:relative;">
+        <div class="opt3-scanline"></div>
+        <div class="opt3-status-bar"><span>SYS://12:45:02</span><span>SIGNAL:OK &bull; PWR:87%</span></div>
+        <div class="opt3-header">
+          <h1>NEURALBRIDGE</h1>
+          <div class="sig">v3.0.0</div>
+        </div>
+
+        <div class="opt3-hud-panel">
+          <div class="opt3-hud-label">// device status</div>
+          <div class="opt3-conn-status">
+            <div class="opt3-pulse"></div>
+            <span class="opt3-conn-text">LINK ESTABLISHED</span>
+          </div>
+          <div class="opt3-device-grid">
+            <div class="opt3-device-cell"><div class="label">Model</div><div class="val">Pixel 8 Pro</div></div>
+            <div class="opt3-device-cell"><div class="label">OS</div><div class="val">Android 15</div></div>
+            <div class="opt3-device-cell"><div class="label">Port</div><div class="val">38472</div></div>
+            <div class="opt3-device-cell"><div class="label">Protocol</div><div class="val">Protobuf</div></div>
+          </div>
+        </div>
+
+        <div class="opt3-hud-panel">
+          <div class="opt3-hud-label">// metrics</div>
+          <div class="opt3-metric-bar">
+            <div class="opt3-metric"><div class="num">3</div><div class="lbl">Latency ms</div></div>
+            <div class="opt3-metric"><div class="num">847</div><div class="lbl">Cmds/hr</div></div>
+            <div class="opt3-metric"><div class="num">1.2k</div><div class="lbl">UI Nodes</div></div>
+          </div>
+        </div>
+
+        <div class="opt3-hud-panel">
+          <div class="opt3-hud-label">// permissions</div>
+          <div class="opt3-hud-content" style="padding:0;">
+            <div class="opt3-perm-row"><span class="opt3-perm-name">ACCESSIBILITY_SVC</span><span class="opt3-perm-status ok">ACTIVE</span></div>
+            <div class="opt3-perm-row"><span class="opt3-perm-name">MEDIA_PROJECTION</span><span class="opt3-perm-status ok">ACTIVE</span></div>
+            <div class="opt3-perm-row"><span class="opt3-perm-name">NOTIF_LISTENER</span><span class="opt3-perm-status no">DENIED</span></div>
+            <div class="opt3-perm-row"><span class="opt3-perm-name">BATTERY_EXEMPT</span><span class="opt3-perm-status ok">ACTIVE</span></div>
+          </div>
+        </div>
+
+        <div class="opt3-hud-panel">
+          <div class="opt3-hud-label">// event stream</div>
+          <div class="opt3-log">
+            <div><span class="dim">[45:02]</span> <span class="green">ACK</span> tap(text="Settings") 4ms</div>
+            <div><span class="dim">[45:01]</span> <span class="cyan">GET</span> ui_tree &rarr; 847 nodes</div>
+            <div><span class="dim">[45:00]</span> <span class="green">ACK</span> screenshot 62ms</div>
+            <div><span class="dim">[44:58]</span> <span class="magenta">WRN</span> projection warm-up</div>
+            <div><span class="dim">[44:55]</span> <span class="green">ACK</span> launch(chrome)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:400px; padding-top:20px;">
+      <div class="type-preview">
+        <div class="heading-font" style="font-family:'Share Tech Mono',monospace; color:#00FFFF; text-shadow:0 0 10px #00FFFF40;">Share Tech Mono</div>
+        <div class="heading-font" style="font-family:'Fira Code',monospace; font-size:22px; color:#E0E0E0;">Fira Code 500</div>
+        <div class="body-font" style="font-family:'Fira Code',monospace; color:#666; margin-top:12px; font-size:13px;">
+          All monospace. Every character aligns. Feels like a real terminal. Share Tech Mono for that classic HUD look.
+        </div>
+      </div>
+      <div class="info-grid" style="padding:20px 0;">
+        <div class="info-card" style="border-color:#00FFFF20;">
+          <h3 style="color:#00FFFF80;">Why This Works</h3>
+          <ul>
+            <li>Maximum visual impact</li>
+            <li>"AI controlling a device" narrative</li>
+            <li>Scanlines + glow = immersive</li>
+            <li>Status colors are intuitive</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-color:#00FFFF20;">
+          <h3 style="color:#00FFFF80;">Trade-offs</h3>
+          <ul>
+            <li style="color:#FF00FF;">Weaker accessibility (neon+dark)</li>
+            <li style="color:#FF00FF;">Harder to maintain</li>
+            <li><span>Corner radius:</span> 2-4dp (angular)</li>
+            <li><span>Icons:</span> Custom HUD / Lucide</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab-bar button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

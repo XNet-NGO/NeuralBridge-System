@@ -1,0 +1,12 @@
+{
+  "name": "neuralbridge-icon-generator",
+  "version": "1.0.0",
+  "description": "Icon generation tooling for NeuralBridge companion app",
+  "private": true,
+  "scripts": {
+    "generate": "node generate-icons.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2"
+  }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NeuralBridge Adaptive Icon Descriptor
+  Android 8.0+ (API 26+)
+
+  Adaptive icons consist of two layers:
+  - Background: Gradient (#004D61 → #1A237E)
+  - Foreground: Wave Bridge design
+
+  The system automatically applies masks (circle, squircle, rounded square)
+  based on device OEM preferences.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background"/>
+    <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+</adaptive-icon>
