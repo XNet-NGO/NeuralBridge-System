@@ -856,28 +856,25 @@ class McpToolHandler(
      * etc. will fail with permission denied. For a real Android shell (shell UID) use
      * `adb shell` over the device connection instead. Returned: stdout, stderr, exit code.
      */
+    /**
+     * android_shell — on X-NIX OS, elevated commands run via xnix-shelld with UID 2000 (AID_SHELL)
+     * in domain u:r:shell:s0 (adb-level privileges: am, pm, dumpsys, settings, input all work).
+     * On standard devices, gracefully falls back to local unprivileged ProcessBuilder.
+     */
     private suspend fun handleShell(args: JsonObject): McpToolCallResult {
         val command = args["command"]?.jsonPrimitive?.contentOrNull ?: return errorResult("command required")
-        val timeoutMs = args["timeout_ms"]?.jsonPrimitive?.longOrNull ?: 10000L
+        val timeoutMs = args["timeout_ms"]?.jsonPrimitive?.longOrNull ?: 15000L
         return withContext(Dispatchers.IO) {
             try {
-                val proc = ProcessBuilder("/system/bin/sh", "-c", command)
-                    .redirectErrorStream(false)
-                    .start()
-                val out = StringBuilder(); val err = StringBuilder()
-                val oT = Thread { proc.inputStream.bufferedReader().forEachLine { out.appendLine(it) } }
-                val eT = Thread { proc.errorStream.bufferedReader().forEachLine { err.appendLine(it) } }
-                oT.start(); eT.start()
-                val finished = proc.waitFor(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)
-                if (!finished) { proc.destroyForcibly(); return@withContext errorResult("shell command timed out after ${timeoutMs}ms") }
-                oT.join(1000); eT.join(1000)
-                val code = proc.exitValue()
-                val cap = 8000
+                val res = com.neuralbridge.companion.shell.ShelldClient.execute(command, timeoutMs)
+                val cap = 16000
                 val result = buildJsonObject {
-                    put("exit_code", code)
-                    put("stdout", out.toString().let { if (it.length > cap) it.substring(0, cap) + "\n<truncated>" else it }.trimEnd())
-                    put("stderr", err.toString().let { if (it.length > cap) it.substring(0, cap) + "\n<truncated>" else it }.trimEnd())
-                    put("uid_note", "runs as app UID (unprivileged); am/pm/settings/input require adb shell")
+                    put("exit_code", res.exitCode)
+                    put("stdout", if (res.stdout.length > cap) res.stdout.substring(0, cap) + "\n<truncated>" else res.stdout)
+                    put("stderr", if (res.stderr.length > cap) res.stderr.substring(0, cap) + "\n<truncated>" else res.stderr)
+                    put("elevated", res.isElevated)
+                    put("execution_method", res.method)
+                    put("uid_level", if (res.isElevated) "AID_SHELL (uid 2000, adb-level)" else "unprivileged app UID")
                 }
                 textResult(result.toString())
             } catch (e: Exception) {

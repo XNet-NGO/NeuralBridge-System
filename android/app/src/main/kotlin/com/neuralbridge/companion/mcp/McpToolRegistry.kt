@@ -378,7 +378,7 @@ object McpToolRegistry {
         // ── SHELL ──────────────────────────────────────────────────────────
         McpToolDefinition(
             name = "android_shell",
-            description = "Run a shell command at the APP's UID (unprivileged sandbox). IMPORTANT: this is NOT 'adb shell' — am/pm/settings/input/dumpsys and reading other apps' data will be DENIED. For a real privileged shell use adb shell over the device connection. Returns stdout, stderr, exit_code.",
+            description = "Run a shell command on the device. On X-NIX OS, executes with AID_SHELL (UID 2000, adb-level privilege) through xnix-shelld — am, pm, dumpsys, settings, input, and system utilities are fully supported. Returns stdout, stderr, exit_code, and execution details.",
             inputSchema = buildJsonObject {
                 put("type", "object")
                 putJsonObject("properties") {

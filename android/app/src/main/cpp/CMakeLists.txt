@@ -23,6 +23,7 @@ endif()
 # Create shared library
 add_library(neuralbridge_jni SHARED
     jpeg_encoder.cpp
+    shelld-client.c
 )
 
 # libjpeg-turbo (not yet integrated)
