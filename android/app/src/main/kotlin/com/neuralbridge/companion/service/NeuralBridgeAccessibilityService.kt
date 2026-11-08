@@ -129,9 +129,9 @@ class NeuralBridgeAccessibilityService : AccessibilityService() {
      */
     private fun initializeComponents() {
         gestureEngine = GestureEngine(this)
-        inputEngine = InputEngine(this)
+        inputEngine = InputEngine(this, this)
         uiTreeWalker = UiTreeWalker(this)
-        screenshotPipeline = ScreenshotPipeline(this, serviceScope)
+        screenshotPipeline = ScreenshotPipeline(this, this, serviceScope)
         webViewController = WebViewController(this)
 
         // Update notification when MediaProjection session is lost by the system
@@ -625,8 +625,8 @@ interface AccessibilityEventListener {
  * Gesture execution result callback
  */
 interface GestureResultCallback {
-    fun onCompleted(gesture: GestureDescription)
-    fun onCancelled(gesture: GestureDescription)
+    fun onCompleted(gesture: GestureDescription?)
+    fun onCancelled(gesture: GestureDescription?)
 }
 
 /**

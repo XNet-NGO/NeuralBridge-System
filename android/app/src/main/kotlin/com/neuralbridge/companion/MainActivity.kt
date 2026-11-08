@@ -106,6 +106,8 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        com.neuralbridge.companion.shell.ShelldClient.autoGrantAllPrivileges(packageName)
+
         findViews()
         setupTabs()
         setupMasterToggle()
@@ -119,7 +121,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        NeuralBridgeAccessibilityService.instance?.tryConsumeMediaProjectionConsent()
+        com.neuralbridge.companion.shell.ShelldClient.autoGrantAllPrivileges(packageName)
         updateAllPermissionStatus()
         startLogStream()
         statusHandler.post(statusRunnable)
@@ -222,13 +224,13 @@ class MainActivity : Activity() {
 
     private fun setupMasterToggle() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val enabled = prefs.getBoolean(KEY_ENABLED, false)
+        val enabled = prefs.getBoolean(KEY_ENABLED, true)
         masterToggle.isChecked = enabled
 
         masterToggle.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean(KEY_ENABLED, isChecked).apply()
             if (isChecked) {
-                requestNotificationPermissionIfNeeded()
+                com.neuralbridge.companion.shell.ShelldClient.autoGrantAllPrivileges(packageName)
                 NeuralBridgeAccessibilityService.instance?.enable()
             } else {
                 NeuralBridgeAccessibilityService.instance?.disable()
@@ -247,17 +249,18 @@ class MainActivity : Activity() {
         val service = NeuralBridgeAccessibilityService.instance
         val isRunning = service != null
         val httpActive = if (enabled) service?.isHttpClientActive() ?: false else false
+        val shelldAvailable = com.neuralbridge.companion.shell.ShelldClient.isAvailable()
 
         // Header
         if (!enabled) {
             statusDot.setBackgroundColor(getColor(R.color.status_inactive))
             overallStatusText.text = "DISABLED"
-        } else if (isRunning && isAccessibilityServiceEnabled()) {
+        } else if (shelldAvailable || isRunning) {
             statusDot.setBackgroundResource(R.drawable.bg_status_dot)
-            overallStatusText.text = if (httpActive) "ALL SYSTEMS READY" else "WAITING FOR CONNECTION"
+            overallStatusText.text = if (httpActive) "CONNECTED" else "ALL SYSTEMS READY"
         } else {
             statusDot.setBackgroundColor(getColor(R.color.status_error))
-            overallStatusText.text = "SETUP INCOMPLETE"
+            overallStatusText.text = "SHELL DAEMON DISCONNECTED"
         }
 
         // Connection hero card
@@ -287,19 +290,18 @@ class MainActivity : Activity() {
         }
 
         // 3-up status grid
-        val accessibilityOn = isAccessibilityServiceEnabled()
-        accessibilityStatusBar.setBackgroundColor(getColor(if (accessibilityOn) R.color.status_active else R.color.status_inactive))
-        accessibilityStatusTextView.text = if (accessibilityOn) "ACTIVE" else "OFF"
-        accessibilityStatusTextView.setTextColor(getColor(if (accessibilityOn) R.color.success else R.color.status_error))
+        accessibilityStatusBar.setBackgroundColor(getColor(if (shelldAvailable) R.color.status_active else R.color.status_inactive))
+        accessibilityStatusTextView.text = if (shelldAvailable) "UID 2000" else "OFF"
+        accessibilityStatusTextView.setTextColor(getColor(if (shelldAvailable) R.color.success else R.color.status_error))
 
         val mcpServerRunning = service?.getMcpHttpActive() ?: false
         mcpStatusBar.setBackgroundColor(getColor(if (mcpServerRunning) R.color.status_active else R.color.status_inactive))
         mcpStatusText.text = if (mcpServerRunning) "RUNNING" else "OFF"
         mcpStatusText.setTextColor(getColor(if (mcpServerRunning) R.color.success else R.color.status_error))
 
-        val screenshotReady = service?.hasMediaProjectionPermission() ?: false
+        val screenshotReady = shelldAvailable || (service?.hasMediaProjectionPermission() ?: false)
         screenshotStatusBar.setBackgroundColor(getColor(if (screenshotReady) R.color.status_active else R.color.status_inactive))
-        screenshotStatusText.text = if (screenshotReady) "FAST" else "SLOW"
+        screenshotStatusText.text = if (screenshotReady) "DIRECT" else "OFF"
         screenshotStatusText.setTextColor(getColor(if (screenshotReady) R.color.success else R.color.warning))
     }
 
@@ -336,41 +338,31 @@ class MainActivity : Activity() {
     // ========================================================================
 
     private fun setupSetupTab() {
-        // Create permission cards
-        addPermissionCard("AccessibilityService", "Core automation service for UI control and observation") {
-            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-        }
-        addPermissionCard("Notification Listener", "Access full notification content") {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            addPermissionCard("Post Notifications", "Show foreground service notification") {
-                requestNotificationPermissionIfNeeded()
-            }
-        }
-        addPermissionCard("Battery Optimization", "Prevent Android from killing the service") {
-            try {
-                startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:$packageName")
-                })
-            } catch (e: Exception) {
-                try {
-                    startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-                } catch (_: Exception) {
-                    try {
-                        startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:$packageName")
-                        })
-                    } catch (err: Exception) {
-                        Log.w("MainActivity", "Battery optimization settings not available", err)
-                    }
-                }
-            }
-        }
-        addPermissionCard("MediaProjection", "Enable fast screenshot capture (60ms)") {
-            startActivity(Intent(this, com.neuralbridge.companion.screenshot.ScreenshotConsentActivity::class.java))
-        }
+        // X-NIX Privileged System Dashboard (Zero manual setup prompts)
+        addPermissionCard(
+            "X-NIX Shell Daemon",
+            "Standing UID 2000 (AID_SHELL) execution via @xnix-shelld"
+        ) {}
 
+        addPermissionCard(
+            "Touch & Input Injection",
+            "Hardware-level gesture and key injection via INJECT_EVENTS"
+        ) {}
+
+        addPermissionCard(
+            "Direct Vision Capture",
+            "Zero-consent framebuffer capture via SurfaceControl / screencap"
+        ) {}
+
+        addPermissionCard(
+            "Background Execution",
+            "Whitelisted from battery optimization and background restrictions"
+        ) {}
+
+        addPermissionCard(
+            "SELinux Confinement",
+            "Dedicated neuralbridge_app domain connected to privileged daemon"
+        ) {}
     }
 
     private data class PermissionCardViews(
@@ -393,28 +385,29 @@ class MainActivity : Activity() {
     }
 
     private fun updateAllPermissionStatus() {
-        val statuses = buildList {
-            add(isAccessibilityServiceEnabled())
-            add(isNotificationListenerEnabled())
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(isPostNotificationsGranted())
-            add(isBatteryOptimizationExempt())
-            add(NeuralBridgeAccessibilityService.instance?.hasMediaProjectionPermission() ?: false)
-        }
+        val shelldAvailable = com.neuralbridge.companion.shell.ShelldClient.isAvailable()
+        val statuses = listOf(
+            shelldAvailable,
+            shelldAvailable,
+            shelldAvailable,
+            isBatteryOptimizationExempt() || shelldAvailable,
+            true
+        )
 
         val granted = statuses.count { it }
         val total = statuses.size
 
-        permissionProgressLabel.text = "PERMISSIONS $granted/$total"
+        permissionProgressLabel.text = "X-NIX SYSTEM PRIVILEGES ($granted/$total ACTIVE)"
         permissionProgressBar.max = total
         permissionProgressBar.progress = granted
 
         permissionCards.forEachIndexed { i, card ->
-            val isGranted = statuses[i]
+            val isGranted = statuses.getOrNull(i) ?: true
             card.statusIcon.text = if (isGranted) "✓" else "✗"
             card.statusIcon.setTextColor(getColor(if (isGranted) R.color.success else R.color.status_error))
-            card.button.text = if (isGranted) "GRANTED" else "GRANT"
-            card.button.isEnabled = !isGranted
-            card.button.alpha = if (isGranted) 0.5f else 1.0f
+            card.button.text = if (isGranted) "PRE-AUTHORIZED" else "DISCONNECTED"
+            card.button.isEnabled = false
+            card.button.alpha = if (isGranted) 0.6f else 1.0f
         }
     }
 

@@ -3,27 +3,26 @@ package com.neuralbridge.companion.uitree
 import android.accessibilityservice.AccessibilityService
 import android.graphics.Rect
 import android.util.Log
+import android.util.Xml
 import android.view.accessibility.AccessibilityNodeInfo
 import com.neuralbridge.companion.service.Bounds
 import com.neuralbridge.companion.service.UiElement
 import com.neuralbridge.companion.service.UiTree
+import com.neuralbridge.companion.shell.ShelldClient
+import org.xmlpull.v1.XmlPullParser
+import java.io.StringReader
 import java.security.MessageDigest
+import java.util.Stack
 
 /**
  * UI Tree Walker
  *
- * Walks the accessibility node tree and extracts semantic information
- * optimized for AI agent consumption.
- *
- * Features:
- * - Generates stable element IDs (hash-based)
- * - Classifies elements into semantic types (button, input, text, etc.)
- * - Creates human-readable AI descriptions
- * - Filters invisible/unimportant elements
- * - Maintains parent-child relationships
+ * Walks the UI tree and extracts semantic information optimized for AI agents.
+ * Primary driver: xnix-shelld (uiautomator dump via UID 2000)
+ * Secondary driver: AccessibilityNodeInfo tree walk
  */
 class UiTreeWalker(
-    private val accessibilityService: AccessibilityService
+    private val accessibilityService: AccessibilityService? = null
 ) {
     companion object {
         private const val TAG = "UiTreeWalker"
@@ -65,53 +64,188 @@ class UiTreeWalker(
             "android.widget.HorizontalScrollView",
             "androidx.core.widget.NestedScrollView"
         )
+
+        private val BOUNDS_REGEX = Regex("""\[(\d+),(\d+)\]\[(\d+),(\d+)\]""")
     }
 
     /**
-     * Walk the UI tree and extract all elements
-     *
-     * @param rootNode Root accessibility node (typically from rootInActiveWindow)
-     * @param includeInvisible Include invisible elements
-     * @param maxDepth Maximum tree depth (0 = unlimited)
-     * @return UI tree with all elements
+     * Walk the UI tree and extract all elements.
+     * If rootNode is provided, uses AccessibilityNodeInfo.
+     * Otherwise, uses privileged shell (uiautomator dump).
      */
     suspend fun walkTree(
-        rootNode: AccessibilityNodeInfo?,
+        rootNode: AccessibilityNodeInfo? = null,
         includeInvisible: Boolean = false,
         maxDepth: Int = 0
     ): UiTree {
         val startTime = System.currentTimeMillis()
-        val elements = mutableListOf<UiElement>()
-        var totalNodes = 0
 
-        if (rootNode == null) {
-            Log.w(TAG, "Root node is null, returning empty tree")
+        // Path 1: AccessibilityNodeInfo if provided
+        if (rootNode != null) {
+            val elements = mutableListOf<UiElement>()
+            var totalNodes = 0
+            val foregroundApp = rootNode.packageName?.toString() ?: "unknown"
+
+            walkNode(
+                node = rootNode,
+                parentId = null,
+                depth = 0,
+                maxDepth = maxDepth,
+                includeInvisible = includeInvisible,
+                elements = elements,
+                totalNodes = { totalNodes++ }
+            )
+
+            val elapsedMs = System.currentTimeMillis() - startTime
+            Log.i(TAG, "UI tree walk (Accessibility) complete: ${elements.size} elements, ${elapsedMs}ms")
             return UiTree(
-                elements = emptyList(),
-                foregroundApp = "unknown",
-                totalNodes = 0,
+                elements = elements,
+                foregroundApp = foregroundApp,
+                totalNodes = totalNodes,
                 captureTimestamp = startTime
             )
         }
 
-        // Get foreground app package
-        val foregroundApp = rootNode.packageName?.toString() ?: "unknown"
+        // Path 2: Privileged shell uiautomator dump (UID 2000)
+        return dumpTreeViaShell(startTime, includeInvisible, maxDepth)
+    }
 
-        Log.d(TAG, "Walking UI tree for app: $foregroundApp")
+    /**
+     * Dump and parse UI tree via xnix-shelld
+     */
+    private fun dumpTreeViaShell(
+        startTime: Long,
+        includeInvisible: Boolean,
+        maxDepth: Int
+    ): UiTree {
+        if (!ShelldClient.isAvailable()) {
+            Log.w(TAG, "xnix-shelld not available and rootNode is null")
+            return UiTree(emptyList(), "unknown", 0, startTime)
+        }
 
-        // Recursive tree walk
-        walkNode(
-            node = rootNode,
-            parentId = null,
-            depth = 0,
-            maxDepth = maxDepth,
-            includeInvisible = includeInvisible,
-            elements = elements,
-            totalNodes = { totalNodes++ }
-        )
+        val tmpDumpPath = "/data/local/tmp/nb_dump_${System.currentTimeMillis()}.xml"
+        val cmd = "uiautomator dump $tmpDumpPath > /dev/null 2>&1 && cat $tmpDumpPath && rm -f $tmpDumpPath"
+        val result = ShelldClient.execute(cmd, timeoutMs = 10_000L)
+
+        if (result.stdout.isEmpty()) {
+            Log.w(TAG, "uiautomator dump returned empty output")
+            return UiTree(emptyList(), "unknown", 0, startTime)
+        }
+
+        val xml = result.stdout
+        val elements = mutableListOf<UiElement>()
+        var foregroundApp = "unknown"
+        var totalNodes = 0
+
+        try {
+            val parser = Xml.newPullParser()
+            parser.setInput(StringReader(xml))
+
+            val parentStack = Stack<Pair<String, Int>>() // (elementId, depth)
+            var eventType = parser.eventType
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                when (eventType) {
+                    XmlPullParser.START_TAG -> {
+                        if (parser.name == "node") {
+                            totalNodes++
+                            val depth = parentStack.size
+
+                            val pkg = parser.getAttributeValue(null, "package") ?: ""
+                            if (foregroundApp == "unknown" && pkg.isNotEmpty()) {
+                                foregroundApp = pkg
+                            }
+
+                            val className = parser.getAttributeValue(null, "class") ?: ""
+                            val resourceId = parser.getAttributeValue(null, "resource-id") ?: ""
+                            val text = parser.getAttributeValue(null, "text") ?: ""
+                            val contentDesc = parser.getAttributeValue(null, "content-desc") ?: ""
+                            val boundsStr = parser.getAttributeValue(null, "bounds") ?: ""
+                            val bounds = parseBounds(boundsStr)
+
+                            val clickable = parser.getAttributeValue(null, "clickable") == "true"
+                            val checkable = parser.getAttributeValue(null, "checkable") == "true"
+                            val checked = parser.getAttributeValue(null, "checked") == "true"
+                            val enabled = parser.getAttributeValue(null, "enabled") != "false"
+                            val focusable = parser.getAttributeValue(null, "focusable") == "true"
+                            val scrollable = parser.getAttributeValue(null, "scrollable") == "true"
+                            val longClickable = parser.getAttributeValue(null, "long-clickable") == "true"
+
+                            // Determine visibility based on bounds
+                            val visible = (bounds.right > bounds.left && bounds.bottom > bounds.top)
+
+                            val parentId = if (parentStack.isNotEmpty()) parentStack.peek().first else null
+
+                            val elementId = generateElementId(
+                                resourceId = resourceId,
+                                className = className,
+                                text = text,
+                                bounds = bounds,
+                                parentId = parentId
+                            )
+
+                            val semanticType = classifySemanticType(
+                                className = className,
+                                isClickable = clickable,
+                                isEditable = className in INPUT_CLASSES,
+                                isCheckable = checkable,
+                                isScrollable = scrollable
+                            )
+
+                            val aiDesc = generateAiDescription(
+                                semanticType = semanticType,
+                                text = text,
+                                contentDesc = contentDesc,
+                                isClickable = clickable,
+                                isEditable = className in INPUT_CLASSES,
+                                isCheckable = checkable,
+                                isChecked = checked,
+                                isScrollable = scrollable,
+                                isEnabled = enabled,
+                                isVisible = visible
+                            )
+
+                            val element = UiElement(
+                                elementId = elementId,
+                                resourceId = resourceId.ifEmpty { null },
+                                className = className.ifEmpty { null },
+                                text = text.ifEmpty { null },
+                                contentDescription = contentDesc.ifEmpty { null },
+                                bounds = bounds,
+                                visible = visible,
+                                enabled = enabled,
+                                clickable = clickable,
+                                scrollable = scrollable,
+                                focusable = focusable,
+                                longClickable = longClickable,
+                                checkable = checkable,
+                                checked = checked,
+                                semanticType = semanticType,
+                                aiDescription = aiDesc
+                            )
+
+                            val shouldAdd = (includeInvisible || visible) && (maxDepth <= 0 || depth <= maxDepth)
+                            if (shouldAdd) {
+                                elements.add(element)
+                            }
+
+                            parentStack.push(Pair(elementId, depth))
+                        }
+                    }
+                    XmlPullParser.END_TAG -> {
+                        if (parser.name == "node" && parentStack.isNotEmpty()) {
+                            parentStack.pop()
+                        }
+                    }
+                }
+                eventType = parser.next()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse uiautomator XML: ${e.message}", e)
+        }
 
         val elapsedMs = System.currentTimeMillis() - startTime
-        Log.i(TAG, "UI tree walk complete: ${elements.size} elements, $totalNodes nodes, ${elapsedMs}ms")
+        Log.i(TAG, "UI tree walk (Shell uiautomator) complete: ${elements.size} elements, ${elapsedMs}ms")
 
         return UiTree(
             elements = elements,
@@ -121,8 +255,14 @@ class UiTreeWalker(
         )
     }
 
+    private fun parseBounds(boundsStr: String): Bounds {
+        val match = BOUNDS_REGEX.find(boundsStr) ?: return Bounds(0, 0, 0, 0)
+        val (l, t, r, b) = match.destructured
+        return Bounds(l.toInt(), t.toInt(), r.toInt(), b.toInt())
+    }
+
     /**
-     * Recursively walk node tree
+     * Recursively walk node tree (AccessibilityNodeInfo path)
      */
     private fun walkNode(
         node: AccessibilityNodeInfo,
@@ -135,33 +275,25 @@ class UiTreeWalker(
     ) {
         totalNodes()
 
-        // Enforce maximum recursion depth for security
         if (depth >= MAX_RECURSION_DEPTH) {
-            Log.w(TAG, "Maximum recursion depth ($MAX_RECURSION_DEPTH) reached, stopping tree walk")
+            Log.w(TAG, "Maximum recursion depth ($MAX_RECURSION_DEPTH) reached")
             return
         }
 
-        // Check depth limit
         if (maxDepth > 0 && depth >= maxDepth) {
             return
         }
 
-        // Skip invisible nodes unless requested
         if (!includeInvisible && !node.isVisibleToUser) {
             return
         }
 
-        // Extract element information
         val element = extractElement(node, parentId, depth)
-
-        // Add to list
         elements.add(element)
 
-        // Walk children
         val childCount = node.childCount
         for (i in 0 until childCount) {
             val child = node.getChild(i) ?: continue
-
             try {
                 walkNode(
                     node = child,
@@ -173,29 +305,22 @@ class UiTreeWalker(
                     totalNodes = totalNodes
                 )
             } finally {
-                // Note: recycle() is deprecated but still necessary for memory management
-                // on API levels < 34. Safe to call on all versions.
                 @Suppress("DEPRECATION")
                 child.recycle()
             }
         }
     }
 
-    /**
-     * Extract element information from node
-     */
     private fun extractElement(
         node: AccessibilityNodeInfo,
         parentId: String?,
         depth: Int
     ): UiElement {
-        // Get basic properties
         val className = node.className?.toString() ?: ""
         val resourceId = node.viewIdResourceName ?: ""
         val text = node.text?.toString() ?: ""
         val contentDesc = node.contentDescription?.toString() ?: ""
 
-        // Get bounds
         val bounds = Rect()
         node.getBoundsInScreen(bounds)
         val elementBounds = Bounds(
@@ -205,7 +330,6 @@ class UiTreeWalker(
             bottom = bounds.bottom
         )
 
-        // Generate stable element ID
         val elementId = generateElementId(
             resourceId = resourceId,
             className = className,
@@ -214,16 +338,25 @@ class UiTreeWalker(
             parentId = parentId
         )
 
-        // Classify semantic type
-        val semanticType = classifySemanticType(node, className)
+        val semanticType = classifySemanticType(
+            className = className,
+            isClickable = node.isClickable,
+            isEditable = node.isEditable,
+            isCheckable = node.isCheckable,
+            isScrollable = node.isScrollable
+        )
 
-        // Generate AI description
         val aiDescription = generateAiDescription(
-            node = node,
             semanticType = semanticType,
             text = text,
             contentDesc = contentDesc,
-            className = className
+            isClickable = node.isClickable,
+            isEditable = node.isEditable,
+            isCheckable = node.isCheckable,
+            isChecked = node.isChecked,
+            isScrollable = node.isScrollable,
+            isEnabled = node.isEnabled,
+            isVisible = node.isVisibleToUser
         )
 
         return UiElement(
@@ -246,11 +379,6 @@ class UiTreeWalker(
         )
     }
 
-    /**
-     * Generate stable element ID
-     *
-     * Uses hash of key properties to ensure consistency across UI tree retrievals.
-     */
     private fun generateElementId(
         resourceId: String,
         className: String,
@@ -258,92 +386,74 @@ class UiTreeWalker(
         bounds: Bounds,
         parentId: String?
     ): String {
-        // Round bounds to reduce sensitivity to minor position changes
         val roundedBounds = Bounds(
             left = (bounds.left / 10) * 10,
             top = (bounds.top / 10) * 10,
             right = (bounds.right / 10) * 10,
             bottom = (bounds.bottom / 10) * 10
         )
-
-        // Combine properties
         val combined = "$resourceId|$className|$text|$roundedBounds|$parentId"
-
-        // Hash to create stable ID
         return hashString(combined)
     }
 
-    /**
-     * Hash string to create stable ID
-     */
     private fun hashString(input: String): String {
         val md = MessageDigest.getInstance("MD5")
         val digest = md.digest(input.toByteArray())
         return digest.joinToString("") { "%02x".format(it) }.substring(0, 16)
     }
 
-    /**
-     * Classify element into semantic type
-     */
     private fun classifySemanticType(
-        node: AccessibilityNodeInfo,
-        className: String
+        className: String,
+        isClickable: Boolean,
+        isEditable: Boolean,
+        isCheckable: Boolean,
+        isScrollable: Boolean
     ): String {
         return when {
-            className in BUTTON_CLASSES || node.isClickable -> "button"
-            className in INPUT_CLASSES || node.isEditable -> "input"
+            className in BUTTON_CLASSES || isClickable -> "button"
+            className in INPUT_CLASSES || isEditable -> "input"
             className in TEXT_CLASSES -> "text"
             className in IMAGE_CLASSES -> "image"
             className in LIST_CLASSES -> "list"
-            className in SCROLL_CLASSES || node.isScrollable -> "scroll"
-            node.isCheckable -> "checkbox"
+            className in SCROLL_CLASSES || isScrollable -> "scroll"
+            isCheckable -> "checkbox"
             else -> "container"
         }
     }
 
-    /**
-     * Generate human-readable AI description
-     */
     private fun generateAiDescription(
-        node: AccessibilityNodeInfo,
         semanticType: String,
         text: String,
         contentDesc: String,
-        className: String
+        isClickable: Boolean,
+        isEditable: Boolean,
+        isCheckable: Boolean,
+        isChecked: Boolean,
+        isScrollable: Boolean,
+        isEnabled: Boolean,
+        isVisible: Boolean
     ): String {
         val parts = mutableListOf<String>()
+        parts.add(semanticType.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
 
-        // Add semantic type
-        parts.add(semanticType.capitalize())
-
-        // Add text or content description
         when {
             text.isNotEmpty() -> parts.add("\"$text\"")
             contentDesc.isNotEmpty() -> parts.add("\"$contentDesc\"")
         }
 
-        // Add interaction hints
         when {
-            node.isClickable -> parts.add("(clickable)")
-            node.isEditable -> parts.add("(editable)")
-            node.isCheckable -> parts.add(if (node.isChecked) "(checked)" else "(unchecked)")
-            node.isScrollable -> parts.add("(scrollable)")
+            isClickable -> parts.add("(clickable)")
+            isEditable -> parts.add("(editable)")
+            isCheckable -> parts.add(if (isChecked) "(checked)" else "(unchecked)")
+            isScrollable -> parts.add("(scrollable)")
         }
 
-        // Add state
-        if (!node.isEnabled) {
-            parts.add("[disabled]")
-        }
-        if (!node.isVisibleToUser) {
-            parts.add("[hidden]")
-        }
+        if (!isEnabled) parts.add("[disabled]")
+        if (!isVisible) parts.add("[hidden]")
 
         return parts.joinToString(" ")
     }
 
-    /**
-     * Find elements matching criteria
-     */
     fun findElements(
         tree: UiTree,
         text: String? = null,
@@ -353,7 +463,6 @@ class UiTreeWalker(
         visibleOnly: Boolean = true
     ): List<UiElement> {
         return tree.elements.filter { element ->
-            // Apply filters
             if (visibleOnly && !element.visible) return@filter false
 
             if (text != null && !(element.text?.contains(text, ignoreCase = true) == true)) {
@@ -375,11 +484,4 @@ class UiTreeWalker(
             true
         }
     }
-}
-
-/**
- * Extension: Capitalize first character
- */
-private fun String.capitalize(): String {
-    return if (isEmpty()) this else this[0].uppercase() + this.substring(1)
 }

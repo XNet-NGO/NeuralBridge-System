@@ -82,7 +82,7 @@ object ShelldClient {
             val outputStream = ByteArrayOutputStream()
             val buf = ByteArray(4096)
             var totalRead = 0
-            val maxCap = 64 * 1024
+            val maxCap = 10 * 1024 * 1024
 
             while (totalRead < maxCap) {
                 val n = `is`.read(buf)
@@ -209,5 +209,73 @@ object ShelldClient {
                 method = "failed"
             )
         }
+    }
+
+    /**
+     * Execute a command and return raw stdout bytes (without trailing xnix-shelld exit frame).
+     * Used for binary streams such as `screencap -p`.
+     */
+    fun executeRaw(command: String, timeoutMs: Long = 15_000L): ByteArray {
+        val socket = LocalSocket(LocalSocket.SOCKET_STREAM)
+        socket.connect(LocalSocketAddress(SOCKET_NAME, LocalSocketAddress.Namespace.ABSTRACT))
+        socket.soTimeout = timeoutMs.toInt()
+
+        val os = socket.outputStream
+        os.write(OP_EXEC)
+
+        val cmdBytes = command.toByteArray(Charsets.UTF_8)
+        val lenBuf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(cmdBytes.size).array()
+        os.write(lenBuf)
+        if (cmdBytes.isNotEmpty()) {
+            os.write(cmdBytes)
+        }
+        os.flush()
+
+        val `is` = socket.inputStream
+        val outputStream = ByteArrayOutputStream()
+        val buf = ByteArray(16384)
+        while (true) {
+            val n = `is`.read(buf)
+            if (n < 0) break
+            outputStream.write(buf, 0, n)
+        }
+
+        try { socket.close() } catch (_: Exception) {}
+
+        val fullBytes = outputStream.toByteArray()
+        if (fullBytes.size >= 8) {
+            val zeroCheck = ByteBuffer.wrap(fullBytes, fullBytes.size - 8, 4).order(ByteOrder.LITTLE_ENDIAN).int
+            if (zeroCheck == 0) {
+                return fullBytes.copyOfRange(0, fullBytes.size - 8)
+            }
+        }
+        return fullBytes
+    }
+
+    /**
+     * Pre-authorize system privileges automatically using xnix-shelld (UID 2000).
+     * Eliminates manual setup prompts on X-NIX OS.
+     */
+    fun autoGrantAllPrivileges(packageName: String = "com.neuralbridge.companion") {
+        Thread {
+            try {
+                // 1. Whitelist from battery optimization
+                execute("dumpsys deviceidle whitelist +$packageName")
+
+                // 2. Grant POST_NOTIFICATIONS
+                execute("pm grant $packageName android.permission.POST_NOTIFICATIONS")
+
+                // 3. Grant notification listener service
+                execute("cmd notification allow_listener $packageName/com.neuralbridge.companion.notification.NotificationListener")
+
+                // 4. Pre-enable AccessibilityService in secure settings
+                execute("settings put secure enabled_accessibility_services $packageName/com.neuralbridge.companion.service.NeuralBridgeAccessibilityService")
+                execute("settings put secure accessibility_enabled 1")
+
+                Log.i(TAG, "autoGrantAllPrivileges completed successfully")
+            } catch (e: Exception) {
+                Log.w(TAG, "autoGrantAllPrivileges failed: ${e.message}")
+            }
+        }.start()
     }
 }

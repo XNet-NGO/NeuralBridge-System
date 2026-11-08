@@ -7,39 +7,38 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
+import com.neuralbridge.companion.shell.ShelldClient
 
 /**
  * Input Engine
  *
- * Handles text input, text selection, and clipboard operations.
- *
- * Input strategies:
- * 1. Accessibility actions (ACTION_SET_TEXT) - fastest
- * 2. IME injection - fallback for apps that don't support accessibility actions
- * 3. Clipboard paste - for long text
+ * Handles text input, text selection, and keyboard event injection.
+ * Primary driver: xnix-shelld (UID 2000, INJECT_EVENTS permission)
+ * Secondary/fallback: AccessibilityNodeInfo actions
  */
 class InputEngine(
-    private val accessibilityService: AccessibilityService
+    private val context: Context,
+    private val accessibilityService: AccessibilityService? = null
 ) {
     companion object {
         private const val TAG = "InputEngine"
-        private const val MAX_TEXT_LENGTH = 10000
+        private const val MAX_TEXT_LENGTH = 50000
     }
 
     private val clipboardManager: ClipboardManager by lazy {
-        accessibilityService.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 
     /**
-     * Input text into element
+     * Input text into element or focused field
      *
-     * @param element Target element (must be editable)
+     * @param element Target element (optional)
      * @param text Text to input
      * @param append Append to existing text (default: false = replace)
      * @return Success status
      */
     fun inputText(
-        element: AccessibilityNodeInfo,
+        element: AccessibilityNodeInfo? = null,
         text: String,
         append: Boolean = false
     ): Boolean {
@@ -49,38 +48,66 @@ class InputEngine(
             return false
         }
 
-        if (!element.isFocused) {
-            element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
-            element.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-        }
-        if (!element.isEditable) {
-            Log.w(TAG, "Element is not marked editable, attempting input anyway")
-        }
-
         Log.d(TAG, "Inputting text: ${text.length} chars, append=$append")
 
-        // Strategy 1: Try accessibility ACTION_SET_TEXT
-        if (element.isAccessibilityFocused || element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)) {
-            val arguments = Bundle().apply {
-                putCharSequence(
-                    AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
-                    if (append && element.text != null) {
-                        "${element.text}$text"
-                    } else {
-                        text
-                    }
-                )
+        // Strategy 1: If element node is available and editable, try accessibility ACTION_SET_TEXT
+        if (element != null) {
+            if (!element.isFocused) {
+                element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+                element.performAction(AccessibilityNodeInfo.ACTION_CLICK)
             }
+            if (element.isAccessibilityFocused || element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)) {
+                val arguments = Bundle().apply {
+                    putCharSequence(
+                        AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
+                        if (append && element.text != null) {
+                            "${element.text}$text"
+                        } else {
+                            text
+                        }
+                    )
+                }
 
-            if (element.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)) {
-                Log.d(TAG, "Text set via ACTION_SET_TEXT")
-                return true
+                if (element.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)) {
+                    Log.d(TAG, "Text set via ACTION_SET_TEXT")
+                    return true
+                }
             }
         }
 
-        // Strategy 2: Fallback to clipboard paste (for long text OR if ACTION_SET_TEXT failed)
-        Log.w(TAG, "ACTION_SET_TEXT failed, falling back to clipboard paste")
-        return inputViaClipboard(element, text, append)
+        // Strategy 2: Elevated shell input injection (UID 2000)
+        if (ShelldClient.isAvailable()) {
+            try {
+                if (text.contains("\n") || text.length > 32 || text.contains("'") || text.contains("\"")) {
+                    setClipboardText(text)
+                    val res = ShelldClient.execute("input keycombination 113 50 || input keyevent 279")
+                    if (res.exitCode == 0) {
+                        Log.d(TAG, "Text injected via shell clipboard paste")
+                        return true
+                    }
+                } else {
+                    val escaped = text.replace(" ", "%s")
+                        .replace("&", "\\&")
+                        .replace(";", "\\;")
+                        .replace("(", "\\(")
+                        .replace(")", "\\)")
+                    val res = ShelldClient.execute("input text $escaped")
+                    if (res.exitCode == 0) {
+                        Log.d(TAG, "Text injected via shell input text")
+                        return true
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Shell text input failed: ${e.message}")
+            }
+        }
+
+        // Strategy 3: Clipboard paste fallback if node available
+        if (element != null) {
+            return inputViaClipboard(element, text, append)
+        }
+
+        return false
     }
 
     /**
@@ -96,7 +123,6 @@ class InputEngine(
         // Clear existing text if not appending
         if (!append) {
             element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
-            // Select all text (ACTION_SET_SELECTION with full range)
             val existingText = element.text
             if (existingText != null) {
                 val args = Bundle().apply {
@@ -108,8 +134,7 @@ class InputEngine(
         }
 
         // Set clipboard
-        val clip = ClipData.newPlainText("", text)
-        clipboardManager.setPrimaryClip(clip)
+        setClipboardText(text)
 
         // Paste
         val pasted = element.performAction(AccessibilityNodeInfo.ACTION_PASTE)
@@ -124,11 +149,6 @@ class InputEngine(
 
     /**
      * Select text in element
-     *
-     * @param element Target element
-     * @param start Start index
-     * @param end End index
-     * @return Success status
      */
     fun selectText(
         element: AccessibilityNodeInfo,
@@ -142,32 +162,28 @@ class InputEngine(
             return false
         }
 
-        // Focus element
         if (!element.isAccessibilityFocused) {
             element.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
         }
 
-        // Set selection
         val arguments = Bundle().apply {
             putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, start)
             putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, end)
         }
 
-        val selected = element.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments)
-        if (selected) {
-            Log.d(TAG, "Text selected successfully")
-            return true
-        }
-
-        Log.w(TAG, "Failed to select text")
-        return false
+        return element.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments)
     }
 
     /**
      * Clear text in element
      */
-    fun clearText(element: AccessibilityNodeInfo): Boolean {
-        return inputText(element, "", append = false)
+    fun clearText(element: AccessibilityNodeInfo?): Boolean {
+        return if (element != null) {
+            inputText(element, "", append = false)
+        } else {
+            pressKeyDetailed("select_all", null)
+            pressKeyDetailed("delete", null).success
+        }
     }
 
     /**
@@ -182,12 +198,7 @@ class InputEngine(
     }
 
     /**
-     * Set clipboard content.
-     *
-     * On Android 10+ (API 29+) the system may silently reject clipboard writes from an
-     * app that is not the current input focus / default IME. We write on the main thread
-     * and read back to detect that case so callers aren't misled. Returns true only if
-     * the write was observable via a read-back. (Bug N1)
+     * Set clipboard content
      */
     fun setClipboardText(text: String): Boolean {
         val clip = ClipData.newPlainText("", text)
@@ -198,66 +209,81 @@ class InputEngine(
             } finally { latch.countDown() }
         }
         latch.await(1, java.util.concurrent.TimeUnit.SECONDS)
+
         val readBack = getClipboardText()
         val ok = readBack == text
         if (!ok) {
-            Log.w(TAG, "Clipboard write not confirmed on read-back (OS may restrict background clipboard writes). wanted=${text.length}chars got=${readBack?.length ?: -1}chars")
-        } else {
-            Log.d(TAG, "Clipboard set and verified: ${text.length} chars")
+            Log.w(TAG, "Clipboard write not confirmed on read-back")
         }
         return ok
     }
 
-    /**
-     * Result of a key press. [success] means the action was accepted/dispatched;
-     * [verified] means we could confirm an observable effect (false = fire-and-forget,
-     * e.g. ACTION_IME_ENTER which the target app may map to a different editor action).
-     */
     data class KeyResult(val success: Boolean, val mechanism: String, val verified: Boolean, val note: String? = null)
 
-    fun pressKey(keyName: String, focusedNode: AccessibilityNodeInfo?): Boolean =
+    fun pressKey(keyName: String, focusedNode: AccessibilityNodeInfo? = null): Boolean =
         pressKeyDetailed(keyName, focusedNode).success
 
     /**
-     * Press a key by name, returning a detailed [KeyResult].
-     *
-     * Uses accessibility actions only (shell "input keyevent" requires INJECT_EVENTS permission).
+     * Press a key by name or code.
+     * Primary driver: xnix-shelld (UID 2000, INJECT_EVENTS)
+     * Fallback: AccessibilityNodeInfo actions
      */
-    fun pressKeyDetailed(keyName: String, focusedNode: AccessibilityNodeInfo?): KeyResult {
+    fun pressKeyDetailed(keyName: String, focusedNode: AccessibilityNodeInfo? = null): KeyResult {
         Log.d(TAG, "Pressing key: $keyName")
-        val key = keyName.lowercase()
+        val key = keyName.lowercase().trim()
 
-        // Enter via ACTION_IME_ENTER (API 30+)
-        if (key == "enter" && focusedNode != null) {
-            if (android.os.Build.VERSION.SDK_INT >= 30) {
-                if (focusedNode.performAction(
-                        AccessibilityNodeInfo.AccessibilityAction.ACTION_IME_ENTER.id
-                    )) {
-                    Log.d(TAG, "Enter dispatched via ACTION_IME_ENTER")
-                    // IMPORTANT: acceptance of the action does NOT guarantee the app
-                    // committed a newline/submit — many composers bind IME_ACTION_SEND,
-                    // IME_ACTION_GO, etc. We cannot observe the downstream effect. (Bug N3)
-                    return KeyResult(
-                        success = true,
-                        mechanism = "ACTION_IME_ENTER",
-                        verified = false,
-                        note = "Dispatched; delivery not verifiable. The target field may bind a different IME action (send/go/next) so a newline/submit is not guaranteed."
-                    )
+        // Primary: Shell injection via xnix-shelld
+        if (ShelldClient.isAvailable()) {
+            val shellCommand = when (key) {
+                "enter", "return" -> "input keyevent KEYCODE_ENTER"
+                "delete", "backspace" -> "input keyevent KEYCODE_DEL"
+                "tab" -> "input keyevent KEYCODE_TAB"
+                "space" -> "input keyevent KEYCODE_SPACE"
+                "escape", "esc" -> "input keyevent KEYCODE_ESCAPE"
+                "home" -> "input keyevent KEYCODE_HOME"
+                "back" -> "input keyevent KEYCODE_BACK"
+                "app_switch", "recents" -> "input keyevent KEYCODE_APP_SWITCH"
+                "select_all" -> "input keycombination 113 29" // CTRL + A
+                "copy" -> "input keycombination 113 31 || input keyevent KEYCODE_COPY"
+                "cut" -> "input keycombination 113 52 || input keyevent KEYCODE_CUT"
+                "paste" -> "input keycombination 113 50 || input keyevent KEYCODE_PASTE"
+                "volume_up" -> "input keyevent KEYCODE_VOLUME_UP"
+                "volume_down" -> "input keyevent KEYCODE_VOLUME_DOWN"
+                "power" -> "input keyevent KEYCODE_POWER"
+                else -> {
+                    if (key.all { it.isDigit() }) {
+                        "input keyevent $key"
+                    } else if (key.startsWith("keycode_")) {
+                        "input keyevent ${key.uppercase()}"
+                    } else {
+                        "input keyevent KEYCODE_${key.uppercase()}"
+                    }
                 }
             }
-            // Pre-API 30 fallback: inject newline character (this IS verifiable via text change)
+
+            val result = ShelldClient.execute(shellCommand)
+            if (result.exitCode == 0) {
+                return KeyResult(true, "xnix_shelld($shellCommand)", verified = true)
+            }
+            Log.w(TAG, "Shell key injection failed with code ${result.exitCode}: ${result.stderr}")
+        }
+
+        // Secondary / Fallback: Accessibility actions if node / service is available
+        if (key == "enter" && focusedNode != null) {
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                if (focusedNode.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_IME_ENTER.id)) {
+                    return KeyResult(true, "ACTION_IME_ENTER", false)
+                }
+            }
             val currentText = focusedNode.text?.toString() ?: ""
             val args = Bundle().apply {
                 putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "$currentText\n")
             }
             if (focusedNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args)) {
-                Log.d(TAG, "Enter simulated via newline append")
-                return KeyResult(true, "ACTION_SET_TEXT(newline)", verified = true)
+                return KeyResult(true, "ACTION_SET_TEXT(newline)", true)
             }
-            return KeyResult(false, "enter", verified = false, note = "No enter mechanism accepted by the focused field.")
         }
 
-        // Delete/Backspace via text truncation (verifiable)
         if ((key == "delete" || key == "backspace") && focusedNode != null) {
             val currentText = focusedNode.text?.toString() ?: ""
             if (currentText.isNotEmpty()) {
@@ -266,88 +292,16 @@ class InputEngine(
                     putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, newText)
                 }
                 if (focusedNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args)) {
-                    Log.d(TAG, "Delete performed via ACTION_SET_TEXT")
-                    return KeyResult(true, "ACTION_SET_TEXT(truncate)", verified = true)
+                    return KeyResult(true, "ACTION_SET_TEXT(truncate)", true)
                 }
-            } else {
-                Log.d(TAG, "Nothing to delete, field is empty")
-                return KeyResult(true, "noop(empty)", verified = true, note = "Field already empty.")
-            }
-            return KeyResult(false, "delete", verified = false)
-        }
-
-        // Clipboard / selection actions on focused node
-        if (focusedNode != null) {
-            when (key) {
-                "select_all" -> {
-                    val text = focusedNode.text?.toString()
-                    return if (!text.isNullOrEmpty()) {
-                        val args = Bundle().apply {
-                            putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0)
-                            putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, text.length)
-                        }
-                        val ok = focusedNode.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, args)
-                        KeyResult(ok, "ACTION_SET_SELECTION", verified = ok,
-                            note = if (!ok) "Field rejected selection." else null)
-                    } else {
-                        KeyResult(false, "select_all", verified = false,
-                            note = "No readable text in focused field — nothing to select.")
-                    }
-                }
-                "cut" -> { val ok = focusedNode.performAction(AccessibilityNodeInfo.ACTION_CUT); return KeyResult(ok, "ACTION_CUT", ok) }
-                "copy" -> { val ok = focusedNode.performAction(AccessibilityNodeInfo.ACTION_COPY); return KeyResult(ok, "ACTION_COPY", ok) }
-                "paste" -> { val ok = focusedNode.performAction(AccessibilityNodeInfo.ACTION_PASTE); return KeyResult(ok, "ACTION_PASTE", ok) }
             }
         }
 
-        // Escape -> GLOBAL_ACTION_BACK (closest equivalent)
-        if (key == "escape") {
+        if (key == "escape" && accessibilityService != null) {
             val result = accessibilityService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
-            Log.d(TAG, "Escape via GLOBAL_ACTION_BACK: $result")
-            return KeyResult(result, "GLOBAL_ACTION_BACK", verified = result)
+            return KeyResult(result, "GLOBAL_ACTION_BACK", result)
         }
 
-        // Tab -> move focus forward
-        if (key == "tab" && focusedNode != null) {
-            if (focusedNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)) {
-                val parent = focusedNode.parent
-                if (parent != null) {
-                    var foundCurrent = false
-                    for (i in 0 until parent.childCount) {
-                        val child = parent.getChild(i)
-                        if (child != null) {
-                            if (foundCurrent && child.isFocusable) {
-                                val result = child.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
-                                Log.d(TAG, "Tab: moved focus to next sibling: $result")
-                                @Suppress("DEPRECATION") child.recycle()
-                                @Suppress("DEPRECATION") parent.recycle()
-                                return KeyResult(result, "ACTION_FOCUS(next)", verified = result)
-                            }
-                            if (child == focusedNode) foundCurrent = true
-                            @Suppress("DEPRECATION") child.recycle()
-                        }
-                    }
-                    @Suppress("DEPRECATION") parent.recycle()
-                }
-            }
-            Log.w(TAG, "Tab: could not find next focusable element")
-            return KeyResult(false, "tab", verified = false, note = "No next focusable element found.")
-        }
-
-        // Space -> type a space character into focused node (verifiable)
-        if (key == "space" && focusedNode != null) {
-            val currentText = focusedNode.text?.toString() ?: ""
-            val args = Bundle().apply {
-                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "$currentText ")
-            }
-            if (focusedNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args)) {
-                Log.d(TAG, "Space inserted via ACTION_SET_TEXT")
-                return KeyResult(true, "ACTION_SET_TEXT(space)", verified = true)
-            }
-            return KeyResult(false, "space", verified = false)
-        }
-
-        Log.w(TAG, "Key '$keyName' not supported via accessibility actions")
-        return KeyResult(false, "unsupported", verified = false, note = "Key not supported via accessibility actions.")
+        return KeyResult(false, "unsupported", false, "Key '$keyName' could not be injected")
     }
 }

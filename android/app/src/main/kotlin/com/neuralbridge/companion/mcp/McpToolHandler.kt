@@ -23,14 +23,33 @@ import kotlinx.serialization.json.*
 import android.accessibilityservice.GestureDescription
 import kotlin.coroutines.resume
 
+import com.neuralbridge.companion.shell.ShelldClient
+
 class McpToolHandler(
-    private val service: NeuralBridgeAccessibilityService,
+    private val context: Context,
     private val gestureEngine: GestureEngine,
     private val uiTreeWalker: UiTreeWalker,
     private val inputEngine: InputEngine,
     private val screenshotPipeline: ScreenshotPipeline,
-    private val webViewController: WebViewController
+    private val webViewController: WebViewController,
+    private val service: NeuralBridgeAccessibilityService? = null
 ) {
+    constructor(
+        service: NeuralBridgeAccessibilityService,
+        gestureEngine: GestureEngine,
+        uiTreeWalker: UiTreeWalker,
+        inputEngine: InputEngine,
+        screenshotPipeline: ScreenshotPipeline,
+        webViewController: WebViewController
+    ) : this(
+        context = service,
+        gestureEngine = gestureEngine,
+        uiTreeWalker = uiTreeWalker,
+        inputEngine = inputEngine,
+        screenshotPipeline = screenshotPipeline,
+        webViewController = webViewController,
+        service = service
+    )
     companion object {
         private const val TAG = "McpToolHandler"
         private const val DEFAULT_TIMEOUT_MS = 10000L
@@ -124,10 +143,10 @@ class McpToolHandler(
     private suspend fun executeGestureAndWait(block: (GestureResultCallback) -> Unit): Boolean =
         suspendCancellableCoroutine { cont ->
             block(object : GestureResultCallback {
-                override fun onCompleted(gesture: GestureDescription) {
+                override fun onCompleted(gesture: GestureDescription?) {
                     if (cont.isActive) cont.resume(true)
                 }
-                override fun onCancelled(gesture: GestureDescription) {
+                override fun onCancelled(gesture: GestureDescription?) {
                     if (cont.isActive) cont.resume(false)
                 }
             })
@@ -157,9 +176,7 @@ class McpToolHandler(
         val maxDepth = args["max_depth"]?.jsonPrimitive?.intOrNull ?: 0
         val filter = args["filter"]?.jsonPrimitive?.contentOrNull ?: "interactive"
 
-        val rootNode = service.rootInActiveWindow
-            ?: return errorResult("No active window available")
-
+        val rootNode = service?.rootInActiveWindow
         val tree = uiTreeWalker.walkTree(rootNode, includeInvisible, maxDepth)
 
         val filtered = when (filter) {
@@ -199,7 +216,7 @@ class McpToolHandler(
 
         val jpegBytes = screenshotPipeline.capture(quality)
         val base64 = Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
-        val dm = service.resources.displayMetrics
+        val dm = context.resources.displayMetrics
         val meta = buildJsonObject {
             put("width", dm.widthPixels)
             put("height", dm.heightPixels)
@@ -222,7 +239,7 @@ class McpToolHandler(
             return errorResult("At least one selector (text, resource_id, content_desc, class_name) required")
         }
 
-        val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+        val rootNode = service?.rootInActiveWindow
         val tree = uiTreeWalker.walkTree(rootNode)
 
         val matches = tree.elements.filter { e ->
@@ -252,7 +269,7 @@ class McpToolHandler(
 
     private suspend fun handleGetScreenContext(args: JsonObject): McpToolCallResult {
         val includeAll = args["include_all_elements"]?.jsonPrimitive?.booleanOrNull ?: false
-        val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+        val rootNode = service?.rootInActiveWindow
         val tree = uiTreeWalker.walkTree(rootNode)
         val jpegBytes = screenshotPipeline.capture(ScreenshotQuality.THUMBNAIL)
         val base64 = Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
@@ -308,7 +325,7 @@ class McpToolHandler(
     }
 
     private suspend fun handleAccessibilityAudit(args: JsonObject): McpToolCallResult {
-        val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+        val rootNode = service?.rootInActiveWindow
         val tree = uiTreeWalker.walkTree(rootNode, includeInvisible = false)
 
         val issues = mutableListOf<String>()
@@ -320,7 +337,7 @@ class McpToolHandler(
             e.bounds?.let { b ->
                 val width = b.right - b.left
                 val height = b.bottom - b.top
-                val dm = service.resources.displayMetrics
+                val dm = context.resources.displayMetrics
                 val minPx = (48 * dm.density).toInt()
                 if (e.clickable && (width < minPx || height < minPx)) {
                     issues.add("Small touch target ${width}x${height}px (min ${minPx}px) on ${e.text ?: e.contentDescription ?: e.className ?: "element"}")
@@ -414,7 +431,7 @@ class McpToolHandler(
         val (tapX, tapY) = if (x != null && y != null) {
             x.toFloat() to y.toFloat()
         } else {
-            val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+            val rootNode = service?.rootInActiveWindow
             val tree = uiTreeWalker.walkTree(rootNode)
             val element = resolveSelector(tree, text, resourceId, contentDesc)
                 ?: return errorResult("Element not found: text=$text, resource_id=$resourceId, content_desc=$contentDesc")
@@ -440,7 +457,7 @@ class McpToolHandler(
         } else {
             val text = args["text"]?.jsonPrimitive?.contentOrNull
             val resourceId = args["resource_id"]?.jsonPrimitive?.contentOrNull
-            val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+            val rootNode = service?.rootInActiveWindow
             val tree = uiTreeWalker.walkTree(rootNode)
             val element = resolveSelector(tree, text, resourceId, null)
                 ?: return errorResult("Element not found")
@@ -464,7 +481,7 @@ class McpToolHandler(
             val text = args["text"]?.jsonPrimitive?.contentOrNull
             val resourceId = args["resource_id"]?.jsonPrimitive?.contentOrNull
             val contentDesc = args["content_desc"]?.jsonPrimitive?.contentOrNull
-            val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+            val rootNode = service?.rootInActiveWindow
             val tree = uiTreeWalker.walkTree(rootNode)
             val element = resolveSelector(tree, text, resourceId, contentDesc)
                 ?: return errorResult("Element not found")
@@ -485,10 +502,6 @@ class McpToolHandler(
         val endY = args["end_y"]?.jsonPrimitive?.intOrNull?.toFloat() ?: return errorResult("end_y required")
         val durationMs = args["duration_ms"]?.jsonPrimitive?.longOrNull ?: 300L
 
-        // Clamp the swipe path out of the system gesture-inset zones so a horizontal
-        // scroll (e.g. an app toolbar) is not captured by the back/recents/home
-        // gestures. (Bug B4) Without this, swipes near the left/right edges or the
-        // bottom strip bubble to the system overview instead of the app window.
         val (cStartX, cStartY) = clampOutOfGestureInsets(startX, startY)
         val (cEndX, cEndY) = clampOutOfGestureInsets(endX, endY)
 
@@ -498,15 +511,8 @@ class McpToolHandler(
         return if (success) textResult("{\"latency_ms\":0}") else errorResult("Swipe cancelled")
     }
 
-    /**
-     * Clamp a point inward so it avoids Android's system gesture-inset regions:
-     *  - left/right edges  → back gesture
-     *  - bottom strip      → home/recents gesture
-     *  - top strip         → status bar / notification pull
-     * Uses a conservative inset derived from display density (~24dp edges, ~48dp bottom).
-     */
     private fun clampOutOfGestureInsets(x: Float, y: Float): Pair<Float, Float> {
-        val dm = service.resources.displayMetrics
+        val dm = context.resources.displayMetrics
         val edge = (24 * dm.density)
         val bottom = (48 * dm.density)
         val top = (24 * dm.density)
@@ -523,8 +529,15 @@ class McpToolHandler(
         val scale = args["scale"]?.jsonPrimitive?.floatOrNull ?: return errorResult("scale required")
         val durationMs = args["duration_ms"]?.jsonPrimitive?.longOrNull ?: 300L
 
+        val baseRadius = 150f
+        val (startRadius, endRadius) = if (scale >= 1f) {
+            baseRadius to (baseRadius * scale)
+        } else {
+            baseRadius to (baseRadius * scale.coerceAtLeast(0.1f))
+        }
+
         val success = withTimeoutOrNull(durationMs + 2000L) {
-            executeGestureAndWait { cb -> gestureEngine.executePinch(centerX, centerY, scale, durationMs, cb) }
+            executeGestureAndWait { cb -> gestureEngine.executePinch(centerX, centerY, startRadius, endRadius, durationMs, cb) }
         } ?: false
         return if (success) textResult("{\"latency_ms\":0}") else errorResult("Pinch cancelled")
     }
@@ -548,41 +561,36 @@ class McpToolHandler(
         val resourceId = args["resource_id"]?.jsonPrimitive?.contentOrNull
         val elementText = args["element_text"]?.jsonPrimitive?.contentOrNull
 
-        val rootNode = service.rootInActiveWindow ?: return errorResult("No active window")
+        val rootNode = service?.rootInActiveWindow
 
-        // Resolve the target editable node.
-        val nodeInfo: android.view.accessibility.AccessibilityNodeInfo = if (resourceId != null || elementText != null) {
-            // Selector given: resolve via UI tree, then re-locate the concrete node.
+        // If target selector given, tap to focus
+        if (resourceId != null || elementText != null) {
             val tree = uiTreeWalker.walkTree(rootNode)
             val target = resolveSelector(tree, elementText, resourceId, null)
                 ?: return errorResult("Element not found: resource_id=$resourceId, text=$elementText")
-            findNodeByElement(rootNode, target.resourceId, target.text)
-                ?: return errorResult("Could not get node reference for element: resource_id=$resourceId, text=$elementText")
-        } else {
-            // No selector: target the actually-focused input field directly.
-            // This handles id-less / text-less EditTexts (e.g. terminal/IME-backed inputs)
-            // that cannot be re-located by resource_id or text. (Bug B1)
-            rootNode.findFocus(android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT)
-                ?: run {
-                    // Fallback: first editable-looking node in the tree.
-                    val tree = uiTreeWalker.walkTree(rootNode)
-                    val guess = tree.elements.firstOrNull { e ->
-                        e.focusable && (
-                            e.className?.contains("EditText") == true ||
-                            e.className?.contains("TextField") == true ||
-                            e.className == "android.widget.AutoCompleteTextView" ||
-                            e.className?.contains("SearchView") == true
-                        )
-                    }
-                    if (guess != null) findNodeByElement(rootNode, guess.resourceId, guess.text) else null
-                }
-                ?: return errorResult("No focused input field found. Tap the field first, or specify resource_id or element_text.")
+            target.bounds?.let { b ->
+                val cx = ((b.left + b.right) / 2).toFloat()
+                val cy = ((b.top + b.bottom) / 2).toFloat()
+                gestureEngine.executeTap(cx, cy, object : GestureResultCallback {
+                    override fun onCompleted(gesture: GestureDescription?) {}
+                    override fun onCancelled(gesture: GestureDescription?) {}
+                })
+                delay(150)
+            }
         }
+
+        val nodeInfo = if (rootNode != null) {
+            if (resourceId != null || elementText != null) {
+                findNodeByElement(rootNode, resourceId, elementText)
+            } else {
+                rootNode.findFocus(android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT)
+            }
+        } else null
 
         val success = inputEngine.inputText(nodeInfo, text, append)
         @Suppress("DEPRECATION")
-        nodeInfo.recycle()
-        return if (success) textResult("{\"latency_ms\":0}") else errorResult("Input text failed (field may reject programmatic input, e.g. a secure IME)")
+        nodeInfo?.recycle()
+        return if (success) textResult("{\"latency_ms\":0}") else errorResult("Input text failed")
     }
 
     private fun findNodeByElement(
@@ -604,7 +612,27 @@ class McpToolHandler(
     private fun handlePressKey(args: JsonObject): McpToolCallResult {
         val key = args["key"]?.jsonPrimitive?.contentOrNull ?: return errorResult("key required")
 
-        // Global actions first (don't need a focused node)
+        // 1. Delegate to InputEngine (which prioritizes xnix-shelld with UID 2000 INJECT_EVENTS)
+        val focusedNode = service?.rootInActiveWindow?.findFocus(
+            android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT
+        )
+
+        val result = inputEngine.pressKeyDetailed(key, focusedNode)
+        @Suppress("DEPRECATION")
+        focusedNode?.recycle()
+
+        if (result.success) {
+            val json = buildJsonObject {
+                put("key", key)
+                put("mechanism", result.mechanism)
+                put("verified", result.verified)
+                result.note?.let { put("note", it) }
+                put("latency_ms", 0)
+            }
+            return textResult(json.toString())
+        }
+
+        // Global actions fallback
         val globalAction = when (key.lowercase()) {
             "back" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK
             "home" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME
@@ -613,54 +641,32 @@ class McpToolHandler(
             "power" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN
             else -> null
         }
-        if (globalAction != null) {
+        if (globalAction != null && service != null) {
             service.performGlobalAction(globalAction)
             return textResult("{\"key\":\"$key\",\"latency_ms\":0}")
         }
 
-        // For other keys, delegate to InputEngine
-        val focusedNode = service.rootInActiveWindow?.findFocus(
-            android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT
-        )
-
-        // Keys that require a focused input field.
-        val focusRequiredKeys = setOf(
-            "enter", "delete", "backspace", "tab", "escape", "space",
-            "select_all", "cut", "copy", "paste"
-        )
-        if (key.lowercase() in focusRequiredKeys && focusedNode == null) {
-            return errorResult(
-                "Key '$key' requires a focused input field, but none is focused. " +
-                "Tap the input field first. Note: a secure IME (e.g. a password/terminal " +
-                "secure keyboard) may not expose focus to accessibility, in which case key " +
-                "injection is not possible — use set_clipboard + the app's paste affordance."
-            )
-        }
-
-        val result = inputEngine.pressKeyDetailed(key, focusedNode)
-        @Suppress("DEPRECATION")
-        focusedNode?.recycle()
-        if (!result.success) {
-            return errorResult(
-                "Key '$key' failed (${result.mechanism}): ${result.note ?: "rejected by focused field"}. " +
-                "Global keys: back, home, recents, notifications, power. " +
-                "Focused-field keys: enter, delete/backspace, tab, escape, space, select_all, cut, copy, paste."
-            )
-        }
-        // Report honestly: 'verified' distinguishes a confirmed effect from a
-        // fire-and-forget dispatch (e.g. ACTION_IME_ENTER). (Bug N3)
-        val json = buildJsonObject {
-            put("key", key)
-            put("mechanism", result.mechanism)
-            put("verified", result.verified)
-            result.note?.let { put("note", it) }
-            put("latency_ms", 0)
-        }
-        return textResult(json.toString())
+        return errorResult("Key '$key' failed (${result.mechanism}): ${result.note ?: "rejected"}")
     }
 
     private fun handleGlobalAction(args: JsonObject): McpToolCallResult {
         val action = args["action"]?.jsonPrimitive?.contentOrNull ?: return errorResult("action required")
+        if (ShelldClient.isAvailable()) {
+            val cmd = when (action.lowercase()) {
+                "back" -> "input keyevent KEYCODE_BACK"
+                "home" -> "input keyevent KEYCODE_HOME"
+                "recents" -> "input keyevent KEYCODE_APP_SWITCH"
+                "notifications" -> "cmd statusbar expand-notifications"
+                "quick_settings" -> "cmd statusbar expand-settings"
+                "power" -> "input keyevent KEYCODE_POWER"
+                else -> null
+            }
+            if (cmd != null) {
+                val res = ShelldClient.execute(cmd)
+                return if (res.exitCode == 0) textResult("{\"action\":\"$action\",\"latency_ms\":0}")
+                else errorResult("Shell global action '$action' failed")
+            }
+        }
         val globalAction = when (action.lowercase()) {
             "back" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK
             "home" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME
@@ -669,7 +675,7 @@ class McpToolHandler(
             "quick_settings" -> android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS
             else -> return errorResult("Unknown action: $action. Valid: back, home, recents, notifications, quick_settings")
         }
-        val success = service.performGlobalAction(globalAction)
+        val success = service?.performGlobalAction(globalAction) ?: false
         return if (success) textResult("{\"action\":\"$action\",\"latency_ms\":0}")
         else errorResult("Global action '$action' failed")
     }
@@ -682,17 +688,22 @@ class McpToolHandler(
         val packageName = args["package_name"]?.jsonPrimitive?.contentOrNull ?: return errorResult("package_name required")
         val clearTask = args["clear_task"]?.jsonPrimitive?.booleanOrNull ?: false
 
-        val pm = service.packageManager
+        val pm = context.packageManager
         val launchIntent = pm.getLaunchIntentForPackage(packageName)
             ?: return errorResult("No launch intent found for package: $packageName")
         if (clearTask) launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         else launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        service.startActivity(launchIntent)
+        context.startActivity(launchIntent)
         return textResult("{\"package_name\":\"$packageName\",\"latency_ms\":0}")
     }
 
     private fun handleCloseApp(args: JsonObject): McpToolCallResult {
-        service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME)
+        val packageName = args["package_name"]?.jsonPrimitive?.contentOrNull
+        if (packageName != null && ShelldClient.isAvailable()) {
+            val res = ShelldClient.execute("am force-stop $packageName")
+            return textResult("{\"success\":${res.exitCode == 0},\"package_name\":\"$packageName\"}")
+        }
+        service?.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME)
         return textResult("{\"success\":true,\"note\":\"Moved to background via HOME.\"}")
     }
 
@@ -701,7 +712,7 @@ class McpToolHandler(
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        service.startActivity(intent)
+        context.startActivity(intent)
         return textResult("{\"url\":\"$url\",\"latency_ms\":0}")
     }
 
@@ -778,7 +789,7 @@ class McpToolHandler(
             val intent = buildIntentFromArgs(args)
             // Starting from a service context requires NEW_TASK.
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            service.startActivity(intent)
+            context.startActivity(intent)
             textResult("{\"success\":true,\"action\":\"${intent.action ?: ""}\"}")
         } catch (e: Exception) {
             errorResult("start_activity failed: ${e.message} (target may not be exported, require a permission the app lacks, or be blocked for background-activity-launch)")
@@ -789,8 +800,8 @@ class McpToolHandler(
         return try {
             val intent = buildIntentFromArgs(args)
             val permission = args["permission"]?.jsonPrimitive?.contentOrNull
-            if (permission != null) service.sendBroadcast(intent, permission)
-            else service.sendBroadcast(intent)
+            if (permission != null) context.sendBroadcast(intent, permission)
+            else context.sendBroadcast(intent)
             textResult("{\"success\":true,\"action\":\"${intent.action ?: ""}\"}")
         } catch (e: Exception) {
             errorResult("send_broadcast failed: ${e.message}")
@@ -801,9 +812,9 @@ class McpToolHandler(
         return try {
             val intent = buildIntentFromArgs(args)
             if (foreground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                service.startForegroundService(intent)
+                context.startForegroundService(intent)
             } else {
-                service.startService(intent)
+                context.startService(intent)
             }
             textResult("{\"success\":true,\"foreground\":$foreground}")
         } catch (e: Exception) {
@@ -817,7 +828,7 @@ class McpToolHandler(
         val selection = args["selection"]?.jsonPrimitive?.contentOrNull
         val limit = args["limit"]?.jsonPrimitive?.intOrNull ?: 50
         return try {
-            val cursor = service.contentResolver.query(Uri.parse(uriStr), projection, selection, null, null)
+            val cursor = context.contentResolver.query(Uri.parse(uriStr), projection, selection, null, null)
                 ?: return errorResult("query returned null (provider not accessible, not found, or permission denied)")
             cursor.use { c ->
                 val cols = c.columnNames
@@ -901,7 +912,7 @@ class McpToolHandler(
 
     private fun handleListApps(args: JsonObject): McpToolCallResult {
         val filter = args["filter"]?.jsonPrimitive?.contentOrNull ?: "all"
-        val pm = service.packageManager
+        val pm = context.packageManager
         val packages = pm.getInstalledPackages(0)
         val filtered = when (filter) {
             "system" -> packages.filter { (it.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0 }
@@ -935,13 +946,11 @@ class McpToolHandler(
 
         val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
-            val rootNode = service.rootInActiveWindow
-            if (rootNode != null) {
-                val tree = uiTreeWalker.walkTree(rootNode)
-                val found = resolveSelector(tree, text, resourceId, contentDesc)
-                if (found != null) {
-                    return textResult("{\"found\":true,\"element\":{\"text\":\"${found.text}\",\"bounds\":\"${found.bounds}\"}}")
-                }
+            val rootNode = service?.rootInActiveWindow
+            val tree = uiTreeWalker.walkTree(rootNode)
+            val found = resolveSelector(tree, text, resourceId, contentDesc)
+            if (found != null) {
+                return textResult("{\"found\":true,\"element\":{\"text\":\"${found.text}\",\"bounds\":\"${found.bounds}\"}}")
             }
             delay(POLL_INTERVAL_MS)
         }
@@ -956,8 +965,7 @@ class McpToolHandler(
 
         val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
-            val rootNode = service.rootInActiveWindow
-            if (rootNode == null) return textResult("{\"found\":false}")
+            val rootNode = service?.rootInActiveWindow
             val tree = uiTreeWalker.walkTree(rootNode)
             val found = resolveSelector(tree, text, resourceId, contentDesc)
             if (found == null) return textResult("{\"found\":false}")
@@ -976,7 +984,7 @@ class McpToolHandler(
                 lastEventTime = System.currentTimeMillis()
             }
         }
-        service.registerEventListener(listener)
+        service?.registerEventListener(listener)
         return try {
             withTimeoutOrNull(timeoutMs) {
                 while (true) {
@@ -987,7 +995,7 @@ class McpToolHandler(
             textResult("{\"idle\":true}")
         } finally {
             // Always unregister — covers normal exit, timeout, and coroutine cancellation
-            service.unregisterEventListener(listener)
+            service?.unregisterEventListener(listener)
         }
     }
 
@@ -998,18 +1006,16 @@ class McpToolHandler(
         val direction = args["direction"]?.jsonPrimitive?.contentOrNull ?: "down"
         val maxScrolls = args["max_scrolls"]?.jsonPrimitive?.intOrNull ?: 20
 
-        val dm = service.resources.displayMetrics
+        val dm = context.resources.displayMetrics
         val centerX = dm.widthPixels / 2f
         val startY = if (direction == "down") dm.heightPixels * 0.7f else dm.heightPixels * 0.3f
         val endY = if (direction == "down") dm.heightPixels * 0.3f else dm.heightPixels * 0.7f
 
         repeat(maxScrolls) { scrollCount ->
-            val rootNode = service.rootInActiveWindow
-            if (rootNode != null) {
-                val tree = uiTreeWalker.walkTree(rootNode)
-                val found = resolveSelector(tree, text, resourceId, contentDesc)
-                if (found != null) return textResult("{\"found\":true,\"scrolls\":$scrollCount}")
-            }
+            val rootNode = service?.rootInActiveWindow
+            val tree = uiTreeWalker.walkTree(rootNode)
+            val found = resolveSelector(tree, text, resourceId, contentDesc)
+            if (found != null) return textResult("{\"found\":true,\"scrolls\":$scrollCount}")
             withTimeoutOrNull(1000L) {
                 executeGestureAndWait { cb -> gestureEngine.executeSwipe(centerX, startY, centerX, endY, 300L, cb) }
             }
@@ -1023,7 +1029,7 @@ class McpToolHandler(
     // =====================================================================
 
     private fun handleListDevices(): McpToolCallResult {
-        val dm = service.resources.displayMetrics
+        val dm = context.resources.displayMetrics
         val result = buildJsonObject {
             putJsonArray("devices") {
                 addJsonObject {
@@ -1084,12 +1090,12 @@ class McpToolHandler(
 
     private fun handleEnableEvents(args: JsonObject): McpToolCallResult {
         val enable = args["enable"]?.jsonPrimitive?.booleanOrNull ?: return errorResult("enable (boolean) required")
-        service.setEventsEnabled(enable)
+        service?.setEventsEnabled(enable)
         return textResult("{\"events_enabled\":$enable}")
     }
 
     private fun handleGetDeviceInfo(): McpToolCallResult {
-        val dm = service.resources.displayMetrics
+        val dm = context.resources.displayMetrics
         val real = realDisplaySize()
         val result = buildJsonObject {
             put("manufacturer", Build.MANUFACTURER)
@@ -1116,16 +1122,16 @@ class McpToolHandler(
      */
     private fun realDisplaySize(): Pair<Int, Int> {
         return try {
-            val wm = service.getSystemService(android.view.WindowManager::class.java)
+            val wm = context.getSystemService(android.view.WindowManager::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val b = wm.currentWindowMetrics.bounds
                 b.width() to b.height()
             } else {
-                val dm = service.resources.displayMetrics
+                val dm = context.resources.displayMetrics
                 dm.widthPixels to dm.heightPixels
             }
         } catch (e: Exception) {
-            val dm = service.resources.displayMetrics
+            val dm = context.resources.displayMetrics
             dm.widthPixels to dm.heightPixels
         }
     }

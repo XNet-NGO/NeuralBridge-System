@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_small"
-                    android:text="Accessibility"
+                    android:text="X-NIX Shell"
                     android:textAppearance="@style/TextAppearance.NeuralBridge.LabelSmall"
                     android:textColor="@color/text_medium_emphasis" />
 
@@ -95,7 +95,7 @@
                     android:id="@+id/accessibilityStatusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OFF"
+                    android:text="UID 2000"
                     android:textAppearance="@style/TextAppearance.NeuralBridge.LabelMedium"
                     android:textStyle="bold" />
 
@@ -158,7 +158,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_small"
-                    android:text="Screenshots"
+                    android:text="Vision Capture"
                     android:textAppearance="@style/TextAppearance.NeuralBridge.LabelSmall"
                     android:textColor="@color/text_medium_emphasis" />
 
@@ -166,7 +166,7 @@
                     android:id="@+id/screenshotStatusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OFF"
+                    android:text="DIRECT"
                     android:textAppearance="@style/TextAppearance.NeuralBridge.LabelMedium"
                     android:textStyle="bold" />
 
